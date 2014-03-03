@@ -96,6 +96,11 @@ h1, h2, th {
   width: 2em;
 }
 
+.name span {
+  color: #008000;
+  padding-right: 0.5em;
+}
+
 .char span {
   box-shadow: 0 0 6px rgba(0,0,0,0.1);
   background: #fff;

@@ -34,7 +34,7 @@ exports.search = function (req, res) {
   // Returns JSON array of characters based on given search criteria.
 
   var queryParams,
-    select = 'SELECT code, name, alt_name FROM chars WHERE ',
+    select = 'SELECT code, name, alt_name, wgl4 FROM chars WHERE ',
     where;
 
   // If both name and block_id are missing, we don't know what to search for.
@@ -53,7 +53,7 @@ exports.search = function (req, res) {
   // Also, with no block ID specified in a search, we return the block name and
   // ID so it can be linked to in the HTML result.
   if (req.query.name && !req.query.block_id) {
-    select = 'SELECT chars.code, chars.name, chars.alt_name, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ';
+    select = 'SELECT chars.code, chars.name, chars.alt_name, chars.wgl4, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ';
     where = 'chars.name LIKE $1 OR chars.alt_name LIKE $1 ORDER BY code LIMIT 300';
     queryParams = ['%' + req.query.name.toUpperCase() + '%'];
   }
@@ -91,6 +91,7 @@ exports.search = function (req, res) {
           hexCode: char.code.toString(16),
           name: char.name,
           altName: char.alt_name,
+          wgl4: char.wgl4,
           block: char.block,
           blockId: char.block_id
         };
@@ -102,7 +103,8 @@ exports.search = function (req, res) {
           code: char.code,
           hexCode: char.code.toString(16),
           name: char.name,
-          altName: char.alt_name
+          altName: char.alt_name,
+          wgl4: char.wgl4,
         };
       });
     }

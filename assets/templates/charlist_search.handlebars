@@ -15,10 +15,12 @@
       <td class="char"><span>{{{char}}}</span></td>
       <td class="dec">{{code}}</td>
       <td class="hex">{{hexCode}}</td>
-      <td class="name">{{name}}
+      <td class="name">
+        {{name}}
         {{#if altName}}
           ({{altName}})
         {{/if}}
+        {{#if wgl4}}<span>(✓ in WGL4)</span>{{/if}}
       </td>
       <td class="block"><a href="#{{blockId}}">{{block}}</a></td>
     </tr>
