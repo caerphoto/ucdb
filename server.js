@@ -13,5 +13,10 @@ app.use(express.static(__dirname + '/static'));
 app.get('/', controllers.chars.blocks);
 app.get('/search', controllers.chars.search);
 
-app.listen(5563); // hex codes for U and c
-console.log("UCDB listening on port 5563.");
+if (process.env.NODE_ENV === 'production') {
+  app.listen(5563, 'localhost'); // hex codes for U and c
+  console.log("UCDB listening on port 5563 to localhost ONLY.");
+} else {
+  app.listen(5563);
+  console.log("UCDB listening on port 5563.");
+}
