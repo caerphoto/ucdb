@@ -1,0 +1,23 @@
+<h2>{{count}} characters</h2>
+<table>
+  <thead>
+    <tr>
+      <th class="char">Character</th>
+      <th class="dec">Decimal</th>
+      <th class="hex">Hex</th>
+      <th class="name">Name</th>
+      <th class="alt_name">Alt. Name</th>
+    </tr>
+  </thead>
+  <tbody>
+{{#each characters}}
+    <tr>
+      <td class="char">{{char}}</td>
+      <td class="dec">{{code}}</td>
+      <td class="hex">{{hexCode}}</td>
+      <td class="name">{{name}}</td>
+      <td class="alt_name">{{altName}}</td>
+    </tr>
+{{/each}}
+  </tbody>
+</table>

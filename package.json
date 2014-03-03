@@ -1,0 +1,22 @@
+{
+  "name": "ucdb",
+  "version": "0.1.0",
+  "description": "Unicode Character Database",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "http://ucdb.andyf.me/",
+  "dependencies": {
+    "express": "3.x",
+    "express3-handlebars": "0.5.x",
+    "pg.js": "2.11.x"
+  },
+  "repository": "",
+  "keywords": [
+    "unicode",
+    "database"
+  ],
+  "author": "Andy Farrell",
+  "license": "BSD"
+}

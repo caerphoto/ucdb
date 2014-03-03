@@ -1,0 +1,58 @@
+html {
+  font: 16px/1.5 "Source Sans Pro", sans-serif;
+  background: #f0f0e8;
+}
+
+body {
+  max-width: 40em;
+  margin: 0 auto;
+}
+
+#controls {
+  margin-bottom: 1em;
+}
+
+#search {
+  border: 1px solid #ddd;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+  font: inherit;
+  padding: 0.2em 0.5em;
+  width: 15em;
+}
+
+#charlist table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#charlist table td {
+  border-color: #ddd;
+  border-width: 0 1px;
+  border-style: solid;
+  padding: 0.2em 0.5em;
+}
+
+#charlist table tr:nth-child(even) {
+  background-color: #f5f5ed;
+}
+
+#charlist table td:first-child {
+  border-left: none;
+}
+
+#charlist table td:last-child {
+  border-right: none;
+}
+
+#charlist table .char {
+  text-align: center;
+}
+
+#charlist table td.char {
+  font-size: 2rem;
+}
+
+#charlist table .dec,
+#charlist table .hex {
+  min-width: 3em;
+}
