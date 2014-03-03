@@ -10,7 +10,7 @@
 html {
   font: 16px/1.5 sans-serif;
   color: #333;
-  background: #f0f0e8;
+  background: #f7f8f9;
 }
 
 body {
@@ -68,7 +68,7 @@ h1, h2, th {
 }
 
 #charlist tr:nth-child(even) {
-  background-color: #f5f5ed;
+  background-color: #f0f1f2;
 }
 
 #charlist td:first-child {

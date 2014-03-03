@@ -102,8 +102,8 @@ exports.search = function (req, res) {
           char: char.name === '<control>' ? '' : '&#' + char.code,
           code: char.code,
           hexCode: char.code.toString(16),
-          name: char.name,
-          altName: char.alt_name,
+          name: char.name || '',
+          altName: char.alt_name || '',
           wgl4: char.wgl4,
         };
       });
