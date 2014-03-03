@@ -33,8 +33,9 @@ exports.blocks = function (req, res) {
 exports.search = function (req, res) {
   // Returns JSON array of characters based on given search criteria.
 
-  var query, queryParams,
-    select = 'SELECT code, name, alt_name FROM chars WHERE ';
+  var queryParams,
+    select = 'SELECT code, name, alt_name FROM chars WHERE ',
+    where;
 
   // If both name and block_id are missing, we don't know what to search for.
   if (!req.query.name && !req.query.block_id) {
@@ -49,41 +50,62 @@ exports.search = function (req, res) {
   // When searching with no block ID, the output must be limited otherwise we
   // might end up returning tens of thousands of characters, and the browser
   // won't like rendering a list that big. TODO: pagination!
+  // Also, with no block ID specified in a search, we return the block name and
+  // ID so it can be linked to in the HTML result.
   if (req.query.name && !req.query.block_id) {
-    query = select + 'name LIKE $1 OR alt_name LIKE $1 ORDER BY code LIMIT 300';
+    select = 'SELECT chars.code, chars.name, chars.alt_name, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ';
+    where = 'chars.name LIKE $1 OR chars.alt_name LIKE $1 ORDER BY code LIMIT 300';
     queryParams = ['%' + req.query.name.toUpperCase() + '%'];
   }
 
   if (req.query.name && req.query.block_id) {
-    query = select + '(name LIKE $1 OR alt_name LIKE $1) AND block_id = $2';
+    where = '(name LIKE $1 OR alt_name LIKE $1) AND block_id = $2';
     queryParams = ['%' + req.query.name.toUpperCase() + '%', +req.query.block_id];
   }
 
   if (req.query.block_id && !req.query.name) {
-    query = select + 'block_id = $1';
+    where = 'block_id = $1';
     queryParams = [+req.query.block_id];
   }
 
-  console.log(query);
+  console.log(select, where);
   console.log(queryParams);
 
-  db.query(query, queryParams, function (err, result) {
+  db.query(select + where, queryParams, function (err, result) {
     var chars;
 
-    if (err) {
+    if (err || !result) {
       console.log('Error selecting characters:', err);
       return res.send(500);
     }
 
-    chars = result.rows.map(function (char) {
-      return {
-        char: char.name === '<control>' ? '' : String.fromCharCode(char.code),
-        code: char.code,
-        hexCode: char.code.toString(16),
-        name: char.name,
-        altName: char.alt_name
-      };
-    });
+    if (result.rows.length === 0) {
+      return res.send(404, []);
+    }
+
+    if (result.rows[0].block_id) {
+      chars = result.rows.map(function (char) {
+        return {
+          char: char.name === '<control>' ? '' : String.fromCharCode(char.code),
+          code: char.code,
+          hexCode: char.code.toString(16),
+          name: char.name,
+          altName: char.alt_name,
+          block: char.block,
+          blockId: char.block_id
+        };
+      });
+    } else {
+      chars = result.rows.map(function (char) {
+        return {
+          char: char.name === '<control>' ? '' : String.fromCharCode(char.code),
+          code: char.code,
+          hexCode: char.code.toString(16),
+          name: char.name,
+          altName: char.alt_name
+        };
+      });
+    }
 
     res.send(chars);
   });

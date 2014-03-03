@@ -8,6 +8,23 @@ body {
   margin: 0 auto;
 }
 
+a {
+  color: #0084d1;
+  border-color: #0084d1;
+  border-style: dotted;
+  border-width: 0;
+}
+
+a:visited {
+  color: #ab45d0;
+  border-color: #ab45d0;
+}
+
+a:hover {
+  color: #51afe6;
+  border-color: #51afe6;
+}
+
 #controls {
   margin-bottom: 1em;
 }
@@ -25,34 +42,48 @@ body {
   width: 100%;
 }
 
-#charlist table td {
+#charlist td {
   border-color: #ddd;
   border-width: 0 1px;
   border-style: solid;
   padding: 0.2em 0.5em;
 }
 
-#charlist table tr:nth-child(even) {
+#charlist tr:nth-child(even) {
   background-color: #f5f5ed;
 }
 
-#charlist table td:first-child {
+#charlist td:first-child {
   border-left: none;
 }
 
-#charlist table td:last-child {
+#charlist td:last-child {
   border-right: none;
 }
 
-#charlist table .char {
+#charlist .char {
   text-align: center;
 }
 
-#charlist table td.char {
+#charlist td.char {
   font-size: 2rem;
 }
 
-#charlist table .dec,
-#charlist table .hex {
-  min-width: 3em;
+#charlist .char {
+  width: 2rem;
+}
+
+#charlist .dec,
+#charlist .hex {
+  width: 2em;
+}
+
+.char span {
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.block a {
+  text-decoration: none;
+  border-bottom-width: 1px;
 }

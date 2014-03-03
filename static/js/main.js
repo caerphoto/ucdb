@@ -1,10 +1,11 @@
 /* global Handlebars */
 (function (D) {
-  var tmpl = Handlebars.templates.charlist,
+  var tmpl = Handlebars.templates,
     blockSelect,
     searchBox,
     blockOnly,
-    charList;
+    charList,
+    searchThrottle;
 
   function encodeObject(o) {
     // Converts the given object to URL query style, e.g.
@@ -24,7 +25,7 @@
       url = '/search';
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === 200 || xhr.status === 404) {
         if (callback instanceof Function) {
           callback(null, JSON.parse(xhr.response));
         }
@@ -46,7 +47,14 @@
         count: data.length,
         characters: data
       };
-    charList.innerHTML = tmpl(view);
+
+    if (data.length === 0) {
+      charList.innerHTML = tmpl.no_result();
+    } else if (data[0].block) {
+      charList.innerHTML = tmpl.charlist_search(view);
+    } else {
+      charList.innerHTML = tmpl.charlist(view);
+    }
   }
 
   function updateList() {
@@ -65,30 +73,62 @@
     });
   }
 
+  function searchChanged() {
+    var lastValue = searchBox.getAttribute('data-last-value');
+
+    if (searchBox.value !== lastValue) {
+      searchBox.setAttribute('data-last-value', searchBox.value);
+      return true;
+    }
+
+    return false;
+  }
+
   D.addEventListener('DOMContentLoaded', function () {
-    blockOnly = D.querySelector('#block_only');
     blockSelect = D.querySelector('#block');
     searchBox = D.querySelector('#search');
+    blockOnly = D.querySelector('#block_only');
     charList = D.querySelector('#charlist');
 
     updateList();
     searchBox.focus();
 
     blockSelect.addEventListener('change', function () {
+      blockOnly.checked = true;
       updateList();
     }, false);
 
-    // TODO: delay search for 300ms or so
     searchBox.addEventListener('keyup', function () {
-      var lastValue = this.getAttribute('data-last-value');
+      if (searchChanged()) {
+        clearTimeout(searchThrottle);
+        searchThrottle = setTimeout(function () {
+          updateList();
+        }, 300);
+      }
+    }, false);
 
-      if (this.value !== lastValue) {
-        this.setAttribute('data-last-value', this.value);
+    // Handle clicks on the (x) button
+    searchBox.addEventListener('click', function () {
+      if (searchChanged()) {
         updateList();
       }
     }, false);
 
     blockOnly.addEventListener('change', function () {
+      updateList();
+    }, false);
+
+    charList.addEventListener('click', function (evt) {
+      var blockId;
+
+      if (evt.target.nodeName !== 'A') {
+        return;
+      }
+
+
+      blockId = evt.target.href.split('#')[1];
+      blockSelect.value = blockId;
+      blockOnly.checked = true;
       updateList();
     }, false);
   }); // DOMContentLoaded
