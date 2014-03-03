@@ -16,7 +16,7 @@ db.connect();
 
 exports.blocks = function (req, res) {
   // Looks up the list of blocks, then renders the homepage.
-  db.query('select name, id from blocks', function (err, result) {
+  db.query('SELECT name, id FROM blocks ORDER BY name', function (err, result) {
 
     if (err) {
       console.log('Error querying blocks:', err);
