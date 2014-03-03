@@ -118,7 +118,9 @@
     }, false);
 
     blockOnly.addEventListener('change', function () {
-      updateList();
+      if (searchBox.value) {
+        updateList();
+      }
     }, false);
 
     window.addEventListener('hashchange', function () {
