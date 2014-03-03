@@ -1,5 +1,14 @@
+@font-face {
+  font-family: 'DejaVuSans';
+  src: url('/media/fonts/DejaVuSans-webfont.eot');
+  src: url('/media/fonts/DejaVuSans-webfont.eot?iefix') format('eot'),
+       url('/media/fonts/DejaVuSans-webfont.woff') format('woff'),
+       url('/media/fonts/DejaVuSans-webfont.ttf') format('truetype'),
+       url('/media/fonts/DejaVuSans-webfont.svg#webfont') format('svg');
+}
+
 html {
-  font: 16px/1.5 "Source Sans Pro", sans-serif;
+  font: 16px/1.5 'DejaVuSans', 'Arial Unicode MS', sans-serif;
   color: #333;
   background: #f0f0e8;
 }
@@ -7,7 +16,7 @@ html {
 body {
   max-width: 55em;
   margin: 0 auto;
-  padding: 0 1em;
+  padding: 0 1em 2em;
 }
 
 a {
