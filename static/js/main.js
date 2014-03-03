@@ -90,12 +90,15 @@
     blockOnly = D.querySelector('#block_only');
     charList = D.querySelector('#charlist');
 
+    if (window.location.hash) {
+      blockSelect.value = window.location.hash.split("#")[1];
+    }
     updateList();
     searchBox.focus();
 
     blockSelect.addEventListener('change', function () {
       blockOnly.checked = true;
-      updateList();
+      window.location.hash = this.value;
     }, false);
 
     searchBox.addEventListener('keyup', function () {
@@ -118,18 +121,11 @@
       updateList();
     }, false);
 
-    charList.addEventListener('click', function (evt) {
-      var blockId;
-
-      if (evt.target.nodeName !== 'A') {
-        return;
-      }
-
-
-      blockId = evt.target.href.split('#')[1];
-      blockSelect.value = blockId;
+    window.addEventListener('hashchange', function () {
+      blockSelect.value = window.location.hash.split("#")[1];
       blockOnly.checked = true;
       updateList();
-    }, false);
+    });
+
   }); // DOMContentLoaded
 }(window.document));

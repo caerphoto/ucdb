@@ -1,11 +1,13 @@
 html {
   font: 16px/1.5 "Source Sans Pro", sans-serif;
+  color: #333;
   background: #f0f0e8;
 }
 
 body {
-  max-width: 40em;
+  max-width: 55em;
   margin: 0 auto;
+  padding: 0 1em;
 }
 
 a {
