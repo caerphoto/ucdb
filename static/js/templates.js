@@ -11,8 +11,8 @@ function program1(depth0,data) {
   buffer += "\n    <tr>\n      <td class=\"char\"><span>";
   if (helper = helpers['char']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['char']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</span></td>\n      <td class=\"dec\">";
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "</span></td>\n      <td class=\"dec\">";
   if (helper = helpers.code) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.code); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -62,8 +62,8 @@ function program1(depth0,data) {
   buffer += "\n    <tr>\n      <td class=\"char\"><span>";
   if (helper = helpers['char']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['char']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</span></td>\n      <td class=\"dec\">";
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "</span></td>\n      <td class=\"dec\">";
   if (helper = helpers.code) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.code); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)

@@ -86,7 +86,7 @@ exports.search = function (req, res) {
     if (result.rows[0].block_id) {
       chars = result.rows.map(function (char) {
         return {
-          char: char.name === '<control>' ? '' : String.fromCharCode(char.code),
+          char: char.name === '<control>' ? '' : '&#' + char.code,
           code: char.code,
           hexCode: char.code.toString(16),
           name: char.name,
@@ -98,7 +98,7 @@ exports.search = function (req, res) {
     } else {
       chars = result.rows.map(function (char) {
         return {
-          char: char.name === '<control>' ? '' : String.fromCharCode(char.code),
+          char: char.name === '<control>' ? '' : '&#' + char.code,
           code: char.code,
           hexCode: char.code.toString(16),
           name: char.name,
