@@ -25,6 +25,7 @@
       url = '/search';
 
     xhr.addEventListener('load', function () {
+      charList.className = '';
       if (xhr.status === 200 || xhr.status === 404) {
         if (callback instanceof Function) {
           callback(null, JSON.parse(xhr.response));
@@ -39,6 +40,8 @@
     xhr.open("GET", url +
       encodeObject({ block_id: blockId, name: searchString }), true);
 
+
+    charList.className = 'loading';
     xhr.send();
   } // ajax()
 

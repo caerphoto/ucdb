@@ -27,6 +27,10 @@ a:hover {
   border-color: #51afe6;
 }
 
+.loading {
+  opacity: 0.5;
+}
+
 #controls {
   margin-bottom: 1em;
 }
