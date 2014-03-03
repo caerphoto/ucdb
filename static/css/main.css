@@ -99,6 +99,8 @@ h1, h2, th {
 .name span {
   color: #008000;
   padding-right: 0.5em;
+  font-size: 0.75em;
+  padding-left: 0.5em;
 }
 
 .char span {
