@@ -65,11 +65,11 @@ exports.search = function (req, res) {
     if (charName) {
       if (blockId === -1) {
         // Char name and 'WGL4' meta-block.
-        where = '(name LIKE $1 OR alt_name LIKE $1) AND wgl4 = true ORDER BY code';
+        where = '(char.name LIKE $1 OR alt_name LIKE $1) AND wgl4 = true ORDER BY code';
         queryParams = ['%' + charName.toUpperCase() + '%'];
       } else {
         // char name and real block ID.
-        where = '(name LIKE $1 OR alt_name LIKE $1) AND block_id = $2 ORDER BY code';
+        where = '(char.name LIKE $1 OR alt_name LIKE $1) AND block_id = $2 ORDER BY code';
         queryParams = ['%' + charName.toUpperCase() + '%', blockId];
       }
     } else {
