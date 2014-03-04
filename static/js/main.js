@@ -1,11 +1,36 @@
 /* global Handlebars */
 (function (D) {
   var tmpl = Handlebars.templates,
+
+    charCache = [],
+
     blockSelect,
     searchBox,
     blockOnly,
+    excludeMissing,
+    wgl4Only,
     charList,
+
+    cx1, cx2,
     searchThrottle;
+
+  function charactersMatch(c1, c2) {
+    // Checks whether the two characters match, by comparing their rendered
+    // images. Uses a global canvas context for performance reasons, to avoid
+    // re-creating them for each character.
+    var d1, d2,
+      i;
+
+    d1 = cx1.getImageData();
+    d2 = cx2.getImageData();
+    while (i--) {
+      if (d1[i] !== d2[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   function encodeObject(o) {
     // Converts the given object to URL query style, e.g.
@@ -45,15 +70,22 @@
     xhr.send();
   } // ajax()
 
-  function renderList(data) {
+  function renderList() {
     var view = {
-        count: data.length,
-        characters: data
+        count: charCache.length,
+        characters: charCache
       };
 
-    if (data.length === 0) {
+    if (wgl4Only.checked) {
+      view.characters = charCache.filter(function (char) {
+        return !!char.wgl4;
+      });
+      view.count = view.characters.length + ' of ' + charCache.length;
+    }
+
+    if (charCache.length === 0) {
       charList.innerHTML = tmpl.no_result();
-    } else if (data[0].block) {
+    } else if (charCache[0].block) {
       charList.innerHTML = tmpl.charlist_search(view);
     } else {
       charList.innerHTML = tmpl.charlist(view);
@@ -68,11 +100,22 @@
     }
 
     fetchChars(blockId, searchBox.value, function (err, data) {
+      var cv1, cv2, cx1, cx2;
+
       if (err) {
         return alert(err);
       }
 
-      renderList(data);
+      if (excludeMissing.checked) {
+        cv1 = D.createElement('canvas');
+        cv2 = D.createElement('canvas');
+        cx1 = cv1.getContext('2d');
+        cx2 = cv2.getContext('2d');
+
+      }
+
+      charCache = data;
+      renderList();
     });
   }
 
@@ -91,6 +134,8 @@
     blockSelect = D.querySelector('#block');
     searchBox = D.querySelector('#search');
     blockOnly = D.querySelector('#block_only');
+    wgl4Only = D.querySelector('#wgl4_only');
+    excludeMissing = {};//D.querySelector('#exclude_missing');
     charList = D.querySelector('#charlist');
 
     if (window.location.hash) {
@@ -124,6 +169,10 @@
       if (searchBox.value) {
         updateList();
       }
+    }, false);
+
+    wgl4Only.addEventListener('change', function () {
+      renderList();
     }, false);
 
     window.addEventListener('hashchange', function () {

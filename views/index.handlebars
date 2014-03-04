@@ -21,11 +21,16 @@
       <br>
 
       <label for="search">Search:</label>
-      <input id="search" type="search" placeholder="enter a character name">
+      <input id="search" type="search" placeholder="enter a character name" data-last-value="">
       <input id="block_only" type="checkbox">
       <label for="block_only">in this block only</label>
 
 
+    </div>
+
+    <div id="wgl4_limiter">
+      <input id="wgl4_only" type="checkbox">
+      <label for="wgl4_only">Limit to characters present in <a href="http://en.wikipedia.org/wiki/Windows_Glyph_List_4">WGL4</a></label>
     </div>
 
     <div id="charlist" class="loading"></div>

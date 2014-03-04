@@ -55,9 +55,15 @@ h1, h2, th {
   width: 15em;
 }
 
+#wgl4_limiter {
+  margin-top: 0.5em;
+  float: right;
+}
+
 #charlist table {
   border-collapse: collapse;
   width: 100%;
+  clear: both;
 }
 
 #charlist td {
@@ -65,6 +71,23 @@ h1, h2, th {
   border-width: 0 1px;
   border-style: solid;
   padding: 0.2em 0.5em;
+}
+
+#charlist td,
+#charlist th {
+  text-align: center;
+}
+
+#charlist .name {
+  text-align: left;
+}
+
+#charlist td.name {
+  text-transform: capitalize;
+}
+
+td.name span {
+  text-transform: none;
 }
 
 #charlist tr:nth-child(even) {

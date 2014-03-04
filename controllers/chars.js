@@ -59,12 +59,12 @@ exports.search = function (req, res) {
   }
 
   if (req.query.name && req.query.block_id) {
-    where = '(name LIKE $1 OR alt_name LIKE $1) AND block_id = $2';
+    where = '(name LIKE $1 OR alt_name LIKE $1) AND block_id = $2 ORDER BY code';
     queryParams = ['%' + req.query.name.toUpperCase() + '%', +req.query.block_id];
   }
 
   if (req.query.block_id && !req.query.name) {
-    where = 'block_id = $1';
+    where = 'block_id = $1 ORDER BY code';
     queryParams = [+req.query.block_id];
   }
 
@@ -89,8 +89,8 @@ exports.search = function (req, res) {
           char: char.name === '<control>' ? '' : '&#' + char.code,
           code: char.code,
           hexCode: char.code.toString(16),
-          name: char.name,
-          altName: char.alt_name,
+          name: (char.name || '').toLowerCase(),
+          altName: (char.alt_name || '').toLowerCase(),
           wgl4: char.wgl4,
           block: char.block,
           blockId: char.block_id
@@ -102,8 +102,8 @@ exports.search = function (req, res) {
           char: char.name === '<control>' ? '' : '&#' + char.code,
           code: char.code,
           hexCode: char.code.toString(16),
-          name: char.name || '',
-          altName: char.alt_name || '',
+          name: (char.name || '').toLowerCase(),
+          altName: (char.alt_name || '').toLowerCase(),
           wgl4: char.wgl4,
         };
       });
