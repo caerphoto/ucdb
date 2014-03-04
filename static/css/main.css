@@ -78,7 +78,8 @@ h1, h2, th {
   text-align: center;
 }
 
-#charlist .name {
+#charlist .name,
+#charlist .block {
   text-align: left;
 }
 
