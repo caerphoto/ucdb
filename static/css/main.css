@@ -121,6 +121,7 @@ td.name span {
 }
 
 .name span {
+  /* 'in WGL4' text */
   color: #008000;
   padding-right: 0.5em;
   font-size: 0.75em;
@@ -128,9 +129,15 @@ td.name span {
 }
 
 .char span {
+  color: #444;
   box-shadow: 0 0 6px rgba(0,0,0,0.1);
   background: #fff;
   font-family: 'DejaVuSans';
+}
+
+.char span:hover {
+  color: #000;
+  box-shadow: 0 0 9px rgba(0,0,0,0.2);
 }
 
 .block a {

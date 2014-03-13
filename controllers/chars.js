@@ -5,11 +5,11 @@ var pg = require('pg.js'),
   db = new pg.Client(config.db);
 
 db.on('error', function (err) {
-  console.log('Database error:', err);
+  console.err('Database error:', err);
 });
 
 db.on('notice', function (notice) {
-  console.log('Database notice:', notice);
+  console.err('Database notice:', notice);
 });
 
 db.connect();
@@ -19,7 +19,7 @@ exports.blocks = function (req, res) {
   db.query('SELECT name, id FROM blocks ORDER BY name', function (err, result) {
 
     if (err) {
-      console.log('Error querying blocks:', err);
+      console.err('Error querying blocks:', err);
       return res.send(500);
     }
 
@@ -87,14 +87,13 @@ exports.search = function (req, res) {
     queryParams = ['%' + req.query.name.toUpperCase() + '%'];
   }
 
-  console.log(select, where);
-  console.log(queryParams);
+  console.log((new Date()) + '\t', select, where + ';\t', queryParams);
 
   db.query(select + where, queryParams, function (err, result) {
     var chars;
 
     if (err || !result) {
-      console.log('Error selecting characters:', err);
+      console.err('Error selecting characters:', err);
       return res.send(500);
     }
 
