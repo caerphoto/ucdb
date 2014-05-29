@@ -120,7 +120,7 @@ td.name span {
   width: 2em;
 }
 
-#charlist td.entity {
+#charlist .entity {
   font-family: "Source Code Pro", "Menlo", "Consolas", monospace;
   text-align: left;
 }
