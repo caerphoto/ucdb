@@ -46,7 +46,7 @@ fs.readFile(__dirname + "/html_entities.txt", ro, function (err, txt) {
       );
     });
 
-    db.end();
+    //db.end();
   });
 });
 
