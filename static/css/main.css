@@ -14,7 +14,7 @@ html {
 }
 
 body {
-  max-width: 55em;
+  max-width: 65em;
   margin: 0 auto;
   padding: 0 1em 2em;
 }
@@ -122,6 +122,7 @@ td.name span {
 
 #charlist td.entity {
   font-family: "Source Code Pro", "Menlo", "Consolas", monospace;
+  text-align: left;
 }
 
 .name span {
