@@ -11,9 +11,10 @@
     wgl4Only,
     charList,
 
-    cx1, cx2,
+    //cx1, cx2,
     searchThrottle;
 
+  /*/
   function charactersMatch(c1, c2) {
     // Checks whether the two characters match, by comparing their rendered
     // images. Uses a global canvas context for performance reasons, to avoid
@@ -31,6 +32,7 @@
 
     return true;
   }
+  /*/
 
   function encodeObject(o) {
     // Converts the given object to URL query style, e.g.
@@ -85,9 +87,10 @@
 
     if (charCache.length === 0) {
       charList.innerHTML = tmpl.no_result();
-    } else if (charCache[0].block) {
-      charList.innerHTML = tmpl.charlist_search(view);
     } else {
+      if (charCache[0].block) {
+        view.showBlock = true;
+      }
       charList.innerHTML = tmpl.charlist(view);
     }
   }

@@ -34,8 +34,8 @@ exports.search = function (req, res) {
   // Returns JSON array of characters based on given search criteria.
 
   var queryParams = [],
-    select = 'SELECT code, name, alt_name, wgl4 FROM chars WHERE ',
-    selectWithBlock = 'SELECT chars.code, chars.name, chars.alt_name, chars.wgl4, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
+    select = 'SELECT code, name, alt_name, wgl4, html_entity FROM chars WHERE ',
+    selectWithBlock = 'SELECT chars.code, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
     where,
     charName = req.query.name || '',
     blockId = +(req.query.block_id || '');
@@ -110,6 +110,7 @@ exports.search = function (req, res) {
           name: (char.name || '').toLowerCase(),
           altName: (char.alt_name || '').toLowerCase(),
           wgl4: char.wgl4,
+          htmlEntity: char.html_entity,
           block: char.block,
           blockId: char.block_id
         };
@@ -123,6 +124,7 @@ exports.search = function (req, res) {
           name: (char.name || '').toLowerCase(),
           altName: (char.alt_name || '').toLowerCase(),
           wgl4: char.wgl4,
+          htmlEntity: char.html_entity
         };
       });
     }

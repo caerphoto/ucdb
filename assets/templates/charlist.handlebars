@@ -5,7 +5,11 @@
       <th class="char">Character</th>
       <th class="dec">Decimal</th>
       <th class="hex">Hex</th>
+      <th class="entity">HTML</th>
       <th class="name">Name</th>
+      {{#if showBlock}}
+      <th class="block">Block</th>
+      {{/if}}
     </tr>
   </thead>
   <tbody>
@@ -14,6 +18,7 @@
       <td class="char"><span>{{{char}}}</span></td>
       <td class="dec">{{code}}</td>
       <td class="hex">{{hexCode}}</td>
+      <td class="entity">{{#if htmlEntity}}&amp;{{htmlEntity}};{{/if}}</td>
       <td class="name">
         {{name}}
         {{#if altName}}
@@ -21,6 +26,10 @@
         {{/if}}
         {{#if wgl4}}<span>(✓ in WGL4)</span>{{/if}}
       </td>
+
+      {{#if ../showBlock}}
+      <td class="block"><a href="#{{blockId}}">{{block}}</a></td>
+      {{/if}}
     </tr>
 {{/each}}
   </tbody>

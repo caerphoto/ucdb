@@ -120,6 +120,10 @@ td.name span {
   width: 2em;
 }
 
+#charlist td.entity {
+  font-family: "Source Code Pro", "Menlo", "Consolas", monospace;
+}
+
 .name span {
   /* 'in WGL4' text */
   color: #008000;
