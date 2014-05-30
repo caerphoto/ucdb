@@ -28,11 +28,12 @@ a {
   border-color: #0084d1;
   border-style: dotted;
   border-width: 0;
+  transition: color 0.2s;
 }
 
 a:visited {
-  color: #ab45d0;
-  border-color: #ab45d0;
+  color: #859;
+  border-color: #859;
 }
 
 a:hover {
