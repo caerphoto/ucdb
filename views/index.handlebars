@@ -8,36 +8,37 @@
     <link rel="stylesheet" href="/css/main.css">
   </head>
   <body>
-    <h1>{{title}}</h1>
-    <p>A simple tool for browsing and searching Unicode characters, inspired by <a href="http://www.alanwood.net/unicode/index.html">Alan Wood</a>, and using data from the official <a href="http://www.unicode.org/ucd/">Unicode Character Database</a>.</p>
+    <header>
+      <h1>{{title}}</h1>
+      <p>A simple tool for browsing and searching Unicode characters, inspired by <a href="http://www.alanwood.net/unicode/index.html">Alan Wood</a>, and using data from the official <a href="http://www.unicode.org/ucd/">Unicode Character Database</a>.</p>
 
-    <div id="controls">
-      <label for="block">Block:</label>
-      <select id="block">
-        <option value="-1">WGL4 meta-block</option>
-        {{#each blocks}}
-        <option value="{{id}}">{{name}}</option>
-        {{/each}}
-      </select>
+      <div id="controls">
+        <label for="block">Block:</label>
+        <select id="block">
+          <option value="-1">WGL4 meta-block</option>
+          {{#each blocks}}
+          <option value="{{id}}">{{name}}</option>
+          {{/each}}
+        </select>
 
-      <br>
+        <br>
 
-      <label for="search">Search: <input id="search" type="search" placeholder="enter a character name" data-last-value=""></label>
-      <label for="block_only"><input id="block_only" type="checkbox">in this block only</label>
+        <label for="search">Search: <input id="search" type="search" placeholder="enter a character name" data-last-value=""></label>
+        <label for="block_only"><input id="block_only" type="checkbox">in this block only</label>
 
+      </div>
 
-
-
-    </div>
-
-    <div id="wgl4_limiter">
-      <label for="wgl4_only"><input id="wgl4_only" type="checkbox">
-      Limit to characters present in <a href="http://en.wikipedia.org/wiki/Windows_Glyph_List_4">WGL4</a></label>
-    </div>
+      <div id="wgl4_limiter">
+        <label for="wgl4_only"><input id="wgl4_only" type="checkbox">
+        Limit to characters present in <a href="http://en.wikipedia.org/wiki/Windows_Glyph_List_4">WGL4</a></label>
+      </div>
+    </header>
 
     <div id="charlist" class="loading"></div>
 
-    <p>By <a href="http://andyf.me/">Andy Farrell</a>.</p>
+    <footer>
+      <p>By <a href="http://andyf.me/">Andy Farrell</a>.</p>
+    </footer>
 
     <script src="/js/lib/handlebars.runtime-v1.3.0.js"></script>
     <script src="/js/templates.js"></script>

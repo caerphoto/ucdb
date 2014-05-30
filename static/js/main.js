@@ -174,7 +174,7 @@
         clearTimeout(searchThrottle);
         searchThrottle = setTimeout(function () {
           updateList();
-        }, 300);
+        }, 500);
       }
     }, false);
 

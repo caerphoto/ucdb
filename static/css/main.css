@@ -167,6 +167,18 @@ td.char span {
     font-size: 14px;
   }
 
+  body {
+    padding: 0.5em 0;
+  }
+
+  header, footer {
+    padding: 0 1em;
+  }
+
+  h2 {
+    padding-left: 1rem;
+  }
+
   .large-screen {
     display: none;
   }
