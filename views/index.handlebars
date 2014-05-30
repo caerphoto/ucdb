@@ -2,14 +2,14 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1">
     <title>{{title}}</title>
     <link rel="shortcut icon" href="http://andyf.me/favicon.ico">
     <link rel="stylesheet" href="/css/main.css">
   </head>
   <body>
-    <p>&larr; <a href="http://andyf.me/">andyf.me</a></p>
     <h1>{{title}}</h1>
-    <p>A simple tool for browsing Unicode characters, inspired by <a href="http://www.alanwood.net/unicode/index.html">Alan Wood</a>.</p>
+    <p>A simple tool for browsing and searching Unicode characters, inspired by <a href="http://www.alanwood.net/unicode/index.html">Alan Wood</a>, and using data from the official <a href="http://www.unicode.org/ucd/">Unicode Character Database</a>.</p>
 
     <div id="controls">
       <label for="block">Block:</label>
@@ -22,20 +22,22 @@
 
       <br>
 
-      <label for="search">Search:</label>
-      <input id="search" type="search" placeholder="enter a character name" data-last-value="">
-      <input id="block_only" type="checkbox">
-      <label for="block_only">in this block only</label>
+      <label for="search">Search: <input id="search" type="search" placeholder="enter a character name" data-last-value=""></label>
+      <label for="block_only"><input id="block_only" type="checkbox">in this block only</label>
+
+
 
 
     </div>
 
     <div id="wgl4_limiter">
-      <input id="wgl4_only" type="checkbox">
-      <label for="wgl4_only">Limit to characters present in <a href="http://en.wikipedia.org/wiki/Windows_Glyph_List_4">WGL4</a></label>
+      <label for="wgl4_only"><input id="wgl4_only" type="checkbox">
+      Limit to characters present in <a href="http://en.wikipedia.org/wiki/Windows_Glyph_List_4">WGL4</a></label>
     </div>
 
     <div id="charlist" class="loading"></div>
+
+    <p>By <a href="http://andyf.me/">Andy Farrell</a>.</p>
 
     <script src="/js/lib/handlebars.runtime-v1.3.0.js"></script>
     <script src="/js/templates.js"></script>

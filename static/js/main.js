@@ -34,6 +34,23 @@
   }
   /*/
 
+  function selectText(element) {
+    // Select the text content of the given element.
+    var range, selection;
+
+    if (D.body.createTextRange) { // ms
+      range = D.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
+    } else if (window.getSelection) { // moz, opera, webkit
+      selection = window.getSelection();
+      range = D.createRange();
+      range.selectNodeContents(element);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+
   function encodeObject(o) {
     // Converts the given object to URL query style, e.g.
     // { name: 'Andy', email: 'ucdb@andyf.me' }
@@ -182,6 +199,21 @@
       blockSelect.value = window.location.hash.split("#")[1];
       blockOnly.checked = true;
       updateList();
+    });
+
+    charList.addEventListener('click', function (evt) {
+      var el = evt.target,
+        parent = el.parentNode;
+
+      if (parent.nodeName === 'TD' && parent.className === 'char') {
+        // iOS won't show the element as selected unless contentEditable is true
+        el.setAttribute('contentEditable', true);
+        selectText(el);
+        setTimeout(function () {
+          el.removeAttribute('contentEditable');
+        }, 0);
+
+      }
     });
 
   }); // DOMContentLoaded

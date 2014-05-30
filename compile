@@ -1,0 +1,1 @@
+handlebars assets/templates/charlist.handlebars assets/templates/no_result.handlebars -f static/js/templates.js

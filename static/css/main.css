@@ -11,6 +11,10 @@ html {
   font: 16px/1.5 sans-serif;
   color: #333;
   background: #f7f8f9;
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  -ms-text-size-adjust: none;
+  text-size-adjust: none;
 }
 
 body {
@@ -37,6 +41,7 @@ a:hover {
 }
 
 h1, h2, th {
+  line-height: 1;
 }
 
 .loading {
@@ -76,6 +81,10 @@ h1, h2, th {
 #charlist th {
   text-align: center;
   padding: 0.2em 0.5em;
+}
+
+#charlist td.char span {
+  cursor: pointer;
 }
 
 #charlist .name,
@@ -121,8 +130,11 @@ td.name span {
 }
 
 #charlist .entity {
-  font-family: "Source Code Pro", "Menlo", "Consolas", monospace;
   text-align: left;
+}
+
+#charlist td.entity {
+  font-family: "Source Code Pro", "Menlo", "Consolas", monospace;
 }
 
 .name span {
@@ -133,7 +145,7 @@ td.name span {
   padding-left: 0.5em;
 }
 
-.char span {
+td.char span {
   color: #444;
   box-shadow: 0 0 6px rgba(0,0,0,0.1);
   background: #fff;
@@ -142,10 +154,58 @@ td.name span {
 
 .char span:hover {
   color: #000;
-  box-shadow: 0 0 9px rgba(0,0,0,0.2);
+  box-shadow: 0 0 9px rgba(32,64,128,0.3);
 }
 
 .block a {
   text-decoration: none;
   border-bottom-width: 1px;
+}
+
+@media screen and (max-width: 600px) {
+  html {
+    font-size: 14px;
+  }
+
+  .large-screen {
+    display: none;
+  }
+
+  label {
+    display: block;
+    margin-top: 0.5em;
+  }
+
+  #wgl4_limiter {
+    float: none;
+  }
+
+  #charlist.char {
+    width: auto;
+  }
+
+  #charlist td.char {
+    font-size: 1.3rem;
+  }
+
+  #charlist .hex {
+    display: none;
+  }
+
+  #charlist td.name,
+  #charlist td.block,
+  #charlist td.entity {
+    font-size: 0.8em;
+  }
+
+  .name span {
+    font-weight: bold;
+  }
+
+}
+
+@media screen and (max-width: 400px) {
+  #charlist .entity {
+    display: none;
+  }
 }

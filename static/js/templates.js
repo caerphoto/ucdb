@@ -70,7 +70,7 @@ function program6(depth0,data) {
 function program8(depth0,data) {
   
   
-  return "<span>(✓ in WGL4)</span>";
+  return "<span>(✓<span class=\"large-screen\"> in WGL4</span>)</span>";
   }
 
 function program10(depth0,data) {
@@ -92,7 +92,7 @@ function program10(depth0,data) {
   if (helper = helpers.count) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.count); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + " characters</h2>\n<table>\n  <thead>\n    <tr>\n      <th class=\"char\">Character</th>\n      <th class=\"dec\">Decimal</th>\n      <th class=\"hex\">Hex</th>\n      <th class=\"entity\">HTML</th>\n      <th class=\"name\">Name</th>\n      ";
+    + " characters</h2>\n<table>\n  <thead>\n    <tr>\n      <th class=\"char\">Char<span class=\"large-screen\">acter</span></th>\n      <th class=\"dec\">Dec<span class=\"large-screen\">imal</span></th>\n      <th class=\"hex\">Hex</th>\n      <th class=\"entity\">HTML</th>\n      <th class=\"name\">Name</th>\n      ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.showBlock), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n    </tr>\n  </thead>\n  <tbody>\n";
