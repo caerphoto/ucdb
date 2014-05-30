@@ -8,7 +8,7 @@
 }
 
 html {
-  font: 16px/1.5 sans-serif;
+  font: 16px/1.5 "Helvetica Neue", "Liberation Sans", "Arial", sans-serif;
   color: #333;
   background: #f7f8f9;
   -webkit-text-size-adjust: none;
@@ -96,10 +96,6 @@ h1, h2, th {
   text-transform: capitalize;
 }
 
-td.name span {
-  text-transform: none;
-}
-
 #charlist tr:nth-child(even) {
   background-color: #f0f1f2;
 }
@@ -137,8 +133,9 @@ td.name span {
   font-family: "Source Code Pro", "Menlo", "Consolas", monospace;
 }
 
-.name span {
+.name > span {
   /* 'in WGL4' text */
+  text-transform: none;
   color: #008000;
   padding-right: 0.5em;
   font-size: 0.75em;
