@@ -53,11 +53,95 @@ h1, h2, th {
   margin-bottom: 1em;
 }
 
-#search {
+.dropdown,
+.dropdown dd,
+.dropdown dt,
+.dropdown ul,
+.dropdown li {
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown,
+.dropdown dd {
+  width: 24em;
+}
+
+.dropdown a {
+  transition: none;
+}
+
+.dropdown dt {
+  position: relative;
+  display: block;
   border: 1px solid #ddd;
-  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
-  font: inherit;
   padding: 0.2em 0.5em;
+  cursor: pointer;
+  background: #fff;
+}
+
+.dropdown dd {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  box-shadow: 1px 2px 5px 1px rgba(0,0,0,0.1);
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  display: none;
+}
+
+.dropdown.open dd {
+  display: block;
+}
+
+.dropdown dt:after {
+  display: block;
+  content: "▾";
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  line-height: 0;
+}
+
+.dropdown dt:hover {
+  color: #0084d1;
+  border-color: #0084d1;
+}
+
+.dropdown li {
+  list-style: none;
+}
+
+.dropdown dd a {
+  text-decoration: none;
+  display: block;
+  padding: 0.2em 0.5em 0.2em 2em;
+  overflow: visible;
+  color: #333;
+}
+
+.dropdown dd a.selected:before {
+  position: absolute;
+  content: "►";
+  left: 0.6em;
+}
+
+
+.dropdown dd a:hover {
+  background-color: #0084d1;
+  color: #fff;
+}
+
+#search {
+  display: inline-block;
+  font: inherit;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  padding: 0.2em 0.5em;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
   width: 15em;
 }
 
@@ -86,6 +170,7 @@ h1, h2, th {
 
 #charlist td.char span {
   cursor: pointer;
+  white-space: pre;
 }
 
 #charlist .name,
@@ -186,6 +271,16 @@ td.char span {
     margin-top: 0.5em;
   }
 
+  .dropdown {
+    width: 20em;
+  }
+
+  .dropdown dd {
+    left: 0;
+    right: 0;
+    width: auto;
+  }
+
   #wgl4_limiter {
     float: none;
   }
@@ -218,4 +313,5 @@ td.char span {
   #charlist .entity {
     display: none;
   }
+
 }

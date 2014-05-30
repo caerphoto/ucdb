@@ -1,10 +1,11 @@
-/* global Handlebars */
+/* global Handlebars, UCDB */
 (function (D) {
   var tmpl = Handlebars.templates,
 
     charCache = [],
 
     blockSelect,
+    blockList,
     searchBox,
     blockOnly,
     excludeMissing,
@@ -59,9 +60,9 @@
     var q = [];
 
     Object.keys(o).forEach(function (key) {
-      q.push(key + "=" + encodeURIComponent(o[key] || ''));
+      q.push(key + '=' + encodeURIComponent(o[key] || ''));
     });
-    return "?" + q.join("&");
+    return '?' + q.join('&');
   }
 
   function fetchChars(blockId, searchString, callback) {
@@ -81,7 +82,7 @@
       }
     }, false);
 
-    xhr.open("GET", url +
+    xhr.open('GET', url +
       encodeObject({ block_id: blockId, name: searchString }), true);
 
 
@@ -113,7 +114,7 @@
   }
 
   function updateList() {
-    var blockId = blockSelect.value;
+    var blockId = blockSelect.getAttribute('data-value');
 
     if (!blockOnly.checked && searchBox.value !== '') {
       blockId = '';
@@ -150,8 +151,77 @@
     return false;
   }
 
+  function toggleClass(el, className) {
+    var classes = el.className.split(' '),
+      i;
+
+    if (classes.length === 0) {
+      el.className = className;
+      return el;
+    }
+
+    i = classes.indexOf(className);
+    if (i !== -1) {
+      classes.splice(i, 1);
+      el.className = classes.join(' ');
+      return el;
+    }
+
+    classes.push(className);
+    el.className = classes.join(' ');
+    return el;
+  }
+
+  function removeClass(el, className) {
+    var classes = el.className.split(' '),
+      i;
+
+    if (classes.length === 0) {
+      return el;
+    }
+
+    i = classes.indexOf(className);
+    if (i === -1) {
+      return el;
+    }
+
+    classes.splice(i, 1);
+    el.className = classes.join(' ');
+    return el;
+  }
+
+  function hasClass(el, className) {
+    var classes;
+
+    if (!el.className) {
+      return false;
+    }
+
+    classes = el.className.split(' ');
+
+    return classes.indexOf(className) !== -1;
+  }
+
+  function setSelectValue(id) {
+    var el = blockList.querySelector('a[href="#' + id + '"]'),
+      prevSelected = blockList.querySelector('.selected');
+
+    if (prevSelected) {
+      prevSelected.className = '';
+    }
+
+    if (el) {
+      el.className = 'selected';
+      blockSelect.setAttribute('data-value', id);
+      blockSelect.innerHTML = UCDB.blockLookup[id];
+    } else {
+      window.location.hash = '-1';
+    }
+  }
+
   D.addEventListener('DOMContentLoaded', function () {
     blockSelect = D.querySelector('#block');
+    blockList = D.querySelector('#block_list');
     searchBox = D.querySelector('#search');
     blockOnly = D.querySelector('#block_only');
     wgl4Only = D.querySelector('#wgl4_only');
@@ -159,14 +229,21 @@
     charList = D.querySelector('#charlist');
 
     if (window.location.hash) {
-      blockSelect.value = window.location.hash.split("#")[1];
+      setSelectValue(window.location.hash.split('#')[1]);
     }
     updateList();
     searchBox.focus();
 
-    blockSelect.addEventListener('change', function () {
+    blockSelect.addEventListener('click', function () {
+      toggleClass(this.parentNode, 'open');
+    });
+
+    blockList.addEventListener('click', function (evt) {
+      var el = evt.target;
+
       blockOnly.checked = true;
-      window.location.hash = this.value;
+      setSelectValue(el.getAttribute('href').split('#')[1]);
+      toggleClass(blockSelect.parentNode, 'open');
     }, false);
 
     searchBox.addEventListener('keyup', function () {
@@ -191,12 +268,19 @@
       }
     }, false);
 
+    D.addEventListener('click', function (evt) {
+      if (!hasClass(evt.target.parentNode, 'dropdown')) {
+        removeClass(blockSelect.parentNode, 'open');
+      }
+    }, false);
+
     wgl4Only.addEventListener('change', function () {
       renderList();
     }, false);
 
     window.addEventListener('hashchange', function () {
-      blockSelect.value = window.location.hash.split("#")[1];
+      var hash = window.location.hash.split('#')[1];
+      setSelectValue(hash);
       blockOnly.checked = true;
       updateList();
     });

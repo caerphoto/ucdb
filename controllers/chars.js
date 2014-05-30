@@ -25,7 +25,8 @@ exports.blocks = function (req, res) {
 
     res.render('index', {
       title: 'Unicode Character Database',
-      blocks: result.rows
+      blocks: result.rows,
+      blocksJSON: JSON.stringify(result.rows)
     });
   });
 };
