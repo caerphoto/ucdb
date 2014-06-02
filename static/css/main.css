@@ -32,17 +32,27 @@ a {
 }
 
 a:visited {
-  color: #859;
-  border-color: #859;
+  color: #6d8ea0;
+  border-color: #6d8ea0;
 }
 
 a:hover {
-  color: #51afe6;
-  border-color: #51afe6;
+  color: #5ec3ff;
+  border-color: #5ec3ff;
 }
 
 h1, h2, th {
   line-height: 1;
+}
+
+h1 {
+  border-bottom: 1px solid #0084d1;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+p {
+  margin: 0 0 1em;
 }
 
 .loading {
