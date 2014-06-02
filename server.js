@@ -6,6 +6,7 @@ var express = require('express'),
   },
   app = express();
 
+app.enable('trust proxy'); // to get original IP of requests
 app.engine('handlebars', hbs());
 app.set('view engine', 'handlebars');
 app.use(express.static(__dirname + '/static'));

@@ -7,11 +7,11 @@ var pg = require('pg.js'),
   MAX_RESULTS = 500;
 
 db.on('error', function (err) {
-  console.err('Database error:', err);
+  console.log('Database error:', err);
 });
 
 db.on('notice', function (notice) {
-  console.err('Database notice:', notice);
+  console.log('Database notice:', notice);
 });
 
 db.connect();
@@ -21,7 +21,7 @@ exports.blocks = function (req, res) {
   db.query('SELECT name, id FROM blocks ORDER BY name', function (err, result) {
 
     if (err) {
-      console.err('Error querying blocks:', err);
+      console.log('Error querying blocks:', err);
       return res.send(500);
     }
 
@@ -92,7 +92,7 @@ exports.search = function (req, res) {
     queryParams = ['%' + charName + '%', hexCode, decCode];
   }
 
-  console.log((new Date()) + '\t', select, where + ';\t', queryParams);
+  console.log((new Date()) + '\t', req.ip, where + ';\t', queryParams);
 
   db.query(select + where, queryParams, function (err, result) {
     var chars;

@@ -35,11 +35,12 @@
           UCDB.blocks.forEach(function (block) {
             UCDB.blockLookup[block.id] = block.name;
           });
+          delete UCDB.blocks;
         </script>
 
         <br>
 
-        <label for="search">Search: <input id="search" type="search" placeholder="enter a character name" data-last-value=""></label>
+        <label for="search">Search: <input id="search" type="search" placeholder="enter a character name or code" data-last-value=""></label>
         <label for="block_only"><input id="block_only" type="checkbox">in this block only</label>
 
       </div>
