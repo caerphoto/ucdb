@@ -42,7 +42,7 @@ exports.search = function (req, res) {
     where,
     charName = (req.query.name || '').toUpperCase(),
     hexCode = charName.toLowerCase(),
-    decCode = parseInt(charName, 10),
+    decCode = parseInt(charName, 10) || 0,
     blockId = +(req.query.block_id || '');
 
   // If both name and block_id are missing, we don't know what to search for.
