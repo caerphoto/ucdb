@@ -17,12 +17,11 @@
         <dl class="dropdown">
           <dt id="block" data-value="-1">WGL4 meta-block</dt>
           <dd>
-            <ul id="block_list">
-              <li><a href="#-1" class="selected">WGL4 meta-block</a></li>
-              {{#each blocks}}
-              <li><a href="#{{id}}">{{name}}</a></li>
+            <nav id="block_list">
+              <a href="#-1" class="selected">WGL4 meta-block</a>
+              {{#each blocks}}<a href="#{{id}}">{{name}}</a>
               {{/each}}
-            </ul>
+            </nav>
           </dd>
         </dl>
 

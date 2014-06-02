@@ -111,10 +111,6 @@ h1, h2, th {
   display: block;
 }
 
-.dropdown li {
-  list-style: none;
-}
-
 .dropdown dd a {
   text-decoration: none;
   display: block;
