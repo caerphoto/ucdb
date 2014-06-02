@@ -2,7 +2,9 @@
 
 var pg = require('pg.js'),
   config = JSON.parse(require('fs').readFileSync('config.json')),
-  db = new pg.Client(config.db);
+  db = new pg.Client(config.db),
+
+  MAX_RESULTS = 500;
 
 db.on('error', function (err) {
   console.err('Database error:', err);
@@ -35,10 +37,12 @@ exports.search = function (req, res) {
   // Returns JSON array of characters based on given search criteria.
 
   var queryParams = [],
-    select = 'SELECT code, name, alt_name, wgl4, html_entity FROM chars WHERE ',
-    selectWithBlock = 'SELECT chars.code, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
+    select = 'SELECT code, code_hex, name, alt_name, wgl4, html_entity FROM chars WHERE ',
+    selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
     where,
-    charName = req.query.name || '',
+    charName = (req.query.name || '').toUpperCase(),
+    hexCode = charName.toLowerCase(),
+    decCode = parseInt(charName, 10),
     blockId = +(req.query.block_id || '');
 
   // If both name and block_id are missing, we don't know what to search for.
@@ -66,12 +70,12 @@ exports.search = function (req, res) {
     if (charName) {
       if (blockId === -1) {
         // Char name and 'WGL4' meta-block.
-        where = '(chars.name LIKE $1 OR alt_name LIKE $1) AND wgl4 = true ORDER BY code';
-        queryParams = ['%' + charName.toUpperCase() + '%'];
+        where = '(chars.name LIKE $1 OR alt_name LIKE $1 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code';
+        queryParams = ['%' + charName + '%', hexCode, decCode];
       } else {
         // char name and real block ID.
-        where = '(chars.name LIKE $1 OR alt_name LIKE $1) AND block_id = $2 ORDER BY code';
-        queryParams = ['%' + charName.toUpperCase() + '%', blockId];
+        where = '(chars.name LIKE $1 OR alt_name LIKE $1 OR code_hex = $2 OR code = $3) AND block_id = $4 ORDER BY code';
+        queryParams = ['%' + charName + '%', hexCode, decCode, blockId];
       }
     } else {
       // Block ID but no char name.
@@ -84,8 +88,8 @@ exports.search = function (req, res) {
     }
   } else {
     // No block ID, implying only char name.
-    where = 'chars.name LIKE $1 OR chars.alt_name LIKE $1 ORDER BY code LIMIT 500';
-    queryParams = ['%' + req.query.name.toUpperCase() + '%'];
+    where = 'chars.name LIKE $1 OR chars.alt_name LIKE $1 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS;
+    queryParams = ['%' + charName + '%', hexCode, decCode];
   }
 
   console.log((new Date()) + '\t', select, where + ';\t', queryParams);
@@ -94,7 +98,8 @@ exports.search = function (req, res) {
     var chars;
 
     if (err || !result) {
-      console.err('Error selecting characters:', err);
+      db.end();
+      console.log('Error selecting characters:', err);
       return res.send(500);
     }
 
@@ -107,7 +112,7 @@ exports.search = function (req, res) {
         return {
           char: char.name === '<control>' ? '' : '&#' + char.code,
           code: char.code,
-          hexCode: char.code.toString(16),
+          hexCode: char.code_hex,
           name: (char.name || '').toLowerCase(),
           altName: (char.alt_name || '').toLowerCase(),
           wgl4: char.wgl4,
@@ -121,7 +126,7 @@ exports.search = function (req, res) {
         return {
           char: char.name === '<control>' ? '' : '&#' + char.code,
           code: char.code,
-          hexCode: char.code.toString(16),
+          hexCode: char.code_hex,
           name: (char.name || '').toLowerCase(),
           altName: (char.alt_name || '').toLowerCase(),
           wgl4: char.wgl4,
