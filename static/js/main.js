@@ -3,6 +3,7 @@
   var tmpl = Handlebars.templates,
 
     charCache = [],
+    searchCount = 0,
 
     blockSelect,
     blockList,
@@ -96,6 +97,10 @@
         characters: charCache
       };
 
+    if (view.count !== searchCount) {
+      view.count = charCache.length + ' of ' + searchCount + ' matching';
+    }
+
     if (wgl4Only.checked) {
       view.characters = charCache.filter(function (char) {
         return !!char.wgl4;
@@ -135,7 +140,8 @@
 
       }
 
-      charCache = data;
+      charCache = data.chars;
+      searchCount = data.count;
       renderList();
     });
   }

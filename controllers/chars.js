@@ -39,7 +39,9 @@ exports.search = function (req, res) {
   var queryParams = [],
     select = 'SELECT code, code_hex, name, alt_name, wgl4, html_entity FROM chars WHERE ',
     selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
+    selectCount = 'SELECT COUNT(code) FROM chars WHERE ',
     where,
+    whereCount,
     charName = (req.query.name || '').toUpperCase(),
     hexCode = charName.toLowerCase(),
     decCode = parseInt(charName, 10) || -1,
@@ -92,50 +94,60 @@ exports.search = function (req, res) {
     queryParams = ['%' + charName + '%', hexCode, decCode];
   }
 
-  console.log((new Date()) + '\t', req.ip, where + ';\t', queryParams);
+  console.log((new Date()) + '\t', req.ip, 'WHERE ' + where + ';\t', queryParams);
 
-  db.query(select + where, queryParams, function (err, result) {
-    var chars;
-
-    if (err || !result) {
-      db.end();
-      console.log('Error selecting characters:', err);
+  whereCount = where.replace('ORDER BY code', '');
+  db.query(selectCount + whereCount, queryParams, function (err, count) {
+    if (err) {
+      console.log('Error getting count:', err);
       return res.send(500);
     }
 
-    if (result.rows.length === 0) {
-      return res.send(404, []);
-    }
+    count = parseInt(count.rows[0].count, 10);
 
-    if (result.rows[0].block_id) {
-      chars = result.rows.map(function (char) {
-        return {
-          char: char.name === '<control>' ? '' : '&#' + char.code,
-          code: char.code,
-          hexCode: char.code_hex,
-          name: (char.name || '').toLowerCase(),
-          altName: (char.alt_name || '').toLowerCase(),
-          wgl4: char.wgl4,
-          htmlEntity: char.html_entity,
-          block: char.block,
-          blockId: char.block_id
-        };
-      });
-    } else {
-      chars = result.rows.map(function (char) {
-        return {
-          char: char.name === '<control>' ? '' : '&#' + char.code,
-          code: char.code,
-          hexCode: char.code_hex,
-          name: (char.name || '').toLowerCase(),
-          altName: (char.alt_name || '').toLowerCase(),
-          wgl4: char.wgl4,
-          htmlEntity: char.html_entity
-        };
-      });
-    }
+    db.query(select + where, queryParams, function (err, result) {
+      var chars;
 
-    res.send(chars);
+      if (err || !result) {
+        db.end();
+        console.log('Error selecting characters:', err);
+        return res.send(500);
+      }
+
+      if (result.rows.length === 0) {
+        return res.send(404, []);
+      }
+
+      if (result.rows[0].block_id) {
+        chars = result.rows.map(function (char) {
+          return {
+            char: char.name === '<control>' ? '' : '&#' + char.code,
+            code: char.code,
+            hexCode: char.code_hex,
+            name: (char.name || '').toLowerCase(),
+            altName: (char.alt_name || '').toLowerCase(),
+            wgl4: char.wgl4,
+            htmlEntity: char.html_entity,
+            block: char.block,
+            blockId: char.block_id
+          };
+        });
+      } else {
+        chars = result.rows.map(function (char) {
+          return {
+            char: char.name === '<control>' ? '' : '&#' + char.code,
+            code: char.code,
+            hexCode: char.code_hex,
+            name: (char.name || '').toLowerCase(),
+            altName: (char.alt_name || '').toLowerCase(),
+            wgl4: char.wgl4,
+            htmlEntity: char.html_entity
+          };
+        });
+      }
+
+      res.send({ chars: chars, count: count });
+    });
   });
 
 };
