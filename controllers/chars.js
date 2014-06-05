@@ -38,7 +38,7 @@ exports.search = function (req, res) {
 
   var queryParams = [],
     select = 'SELECT code, code_hex, name, alt_name, wgl4, html_entity, COUNT(code) OVER () AS count FROM chars WHERE ',
-    selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_i, COUNT(code) OVER () AS count FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
+    selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id, COUNT(code) OVER () AS count FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
     where,
     charName = (req.query.name || '').toUpperCase(),
     hexCode = charName.toLowerCase(),
@@ -104,7 +104,7 @@ exports.search = function (req, res) {
     }
 
     if (result.rows.length === 0) {
-      return res.send(404, []);
+      return res.send(404, { chars:[], count: 0 });
     }
 
     count = parseInt(count = result.rows[0].count, 10);

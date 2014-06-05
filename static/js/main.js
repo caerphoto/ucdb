@@ -157,43 +157,48 @@
     return false;
   }
 
-  function toggleClass(el, className) {
+  function toggleClass(el, className, on) {
     var classes = el.className.split(' '),
       i;
 
-    if (classes.length === 0) {
-      el.className = className;
-      return el;
-    }
+    if (typeof on === 'undefined') {
+      // Toggle the class based on what it already is.
+      if (classes.length === 0) {
+        el.className = className;
+        return el;
+      }
 
-    i = classes.indexOf(className);
-    if (i !== -1) {
-      classes.splice(i, 1);
+      i = classes.indexOf(className);
+      if (i !== -1) {
+        classes.splice(i, 1);
+      } else {
+        classes.push(className);
+      }
+
       el.className = classes.join(' ');
-      return el;
+
+    } else {
+      i = classes.indexOf(className);
+      if (on) {
+        if (i === -1) {
+          classes.push(className);
+        }
+        // if on && i !== -1, don't need to do anything
+      } else {
+        if (i !== -1) {
+          classes.splice(i, 1);
+        }
+        // if !on && i === -1, don't need to do anything
+      }
+
+      el.className = classes.join(' ');
     }
 
-    classes.push(className);
-    el.className = classes.join(' ');
     return el;
   }
 
   function removeClass(el, className) {
-    var classes = el.className.split(' '),
-      i;
-
-    if (classes.length === 0) {
-      return el;
-    }
-
-    i = classes.indexOf(className);
-    if (i === -1) {
-      return el;
-    }
-
-    classes.splice(i, 1);
-    el.className = classes.join(' ');
-    return el;
+    toggleClass(el, className, false);
   }
 
   function hasClass(el, className) {
@@ -276,7 +281,7 @@
 
     D.addEventListener('click', function (evt) {
       if (!hasClass(evt.target.parentNode, 'dropdown')) {
-        removeClass(blockSelect.parentNode, 'open');
+        removeClass(blockSelect.parentNode, 'open', false);
       }
     }, false);
 

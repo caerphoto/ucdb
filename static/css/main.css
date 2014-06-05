@@ -55,6 +55,36 @@ p {
   margin: 0 0 1em;
 }
 
+input[type=checkbox] {
+  display: none;
+}
+
+input[type=checkbox] + label {
+  cursor: pointer;
+}
+
+input[type=checkbox] + label::before {
+  content: "\a0"; /* non-breaking space */
+  display: inline-block;
+  border: 1px solid #aaa;
+  line-height: 1;
+  text-align: center;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  background: #fff;
+}
+
+input[type=checkbox]:checked + label::before {
+  content: "\2714"; /* heavy check mark ✔ */
+}
+
+input[type=checkbox] + label:hover::before {
+  color: #0084d1;
+  border-color: #0084d1;
+}
+
 .loading {
   opacity: 0.5;
 }
@@ -84,7 +114,7 @@ p {
 .dropdown dt {
   position: relative;
   display: block;
-  border: 1px solid #ddd;
+  border: 1px solid #aaa;
   padding: 0.2em 0.5em;
   cursor: pointer;
   background: #fff;
@@ -109,7 +139,7 @@ p {
   top: 0;
   bottom: 0;
   box-sizing: border-box;
-  border: 1px solid #ddd;
+  border: 1px solid #aaa;
   box-shadow: 1px 2px 5px 1px rgba(0,0,0,0.1);
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -144,7 +174,7 @@ p {
 #search {
   display: inline-block;
   font: inherit;
-  border: 1px solid #ddd;
+  border: 1px solid #aaa;
   border-radius: 0;
   padding: 0.2em 0.5em;
   width: 17em;
