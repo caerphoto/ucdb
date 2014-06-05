@@ -55,6 +55,13 @@ p {
   margin: 0 0 1em;
 }
 
+p.alert {
+  color: #cf000b;
+  padding: 1em;
+  background: #fff;
+  border: 1px solid #cf000b;
+}
+
 input[type=checkbox] {
   display: none;
 }
