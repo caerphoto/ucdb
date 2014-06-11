@@ -93,7 +93,7 @@ input[type=checkbox] + label:hover::before {
 }
 
 #bg {
-  font: 4em/1 "Source Code Pro", "Consolas", "Inconsolata", "Monaco", monospace;
+  font: 4em/1  "Adobe Caslon Pro", "Times New Roman", serif;
   color: #f5f5f5;
   overflow: hidden;
   white-space: pre;
