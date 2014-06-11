@@ -6,3 +6,4 @@ pids
 .grunt
 npm-debug.log
 node_modules
+static/js/randomcharbg.js

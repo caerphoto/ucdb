@@ -10,7 +10,7 @@
 html {
   font: 16px/1.5 "Helvetica Neue", "Liberation Sans", "Arial", sans-serif;
   color: #333;
-  background: #fafafa;
+  background-color: #fafafa;
   -webkit-text-size-adjust: none;
   -moz-text-size-adjust: none;
   -ms-text-size-adjust: none;
@@ -93,18 +93,13 @@ input[type=checkbox] + label:hover::before {
 }
 
 #bg {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-
   font: 4em/1 "Source Code Pro", "Consolas", "Inconsolata", "Monaco", monospace;
   color: #f5f5f5;
   overflow: hidden;
   white-space: pre;
   letter-spacing: 0.2em;
   z-index: -1;
+  background-repeat: repeat-y;
   pointer-events: none;
 }
 
