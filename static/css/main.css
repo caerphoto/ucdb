@@ -62,6 +62,11 @@ p.alert {
   border: 1px solid #cf000b;
 }
 
+label {
+  min-width: 4em;
+  display: inline-block;
+}
+
 input[type=checkbox] {
   display: none;
 }
@@ -92,12 +97,15 @@ input[type=checkbox] + label:hover::before {
   border-color: #0084d1;
 }
 
+p, label, h1, h2 {
+  text-shadow: 0 0 5px #fafafa;
+}
+
 #bg {
-  font: 4em/1  "Adobe Caslon Pro", "Times New Roman", serif;
-  color: #f5f5f5;
+  font: 2em/1.2  "Adobe Caslon Pro", "Times New Roman", serif;
+  color: rgba(0, 0, 0, 0.03);
   overflow: hidden;
   white-space: pre;
-  letter-spacing: 0.2em;
   z-index: -1;
   background-repeat: repeat-y;
   pointer-events: none;
@@ -118,6 +126,11 @@ input[type=checkbox] + label:hover::before {
 .dropdown li {
   margin: 0;
   padding: 0;
+}
+
+.dropdown {
+  display: inline-block;
+  margin-bottom: 1em;
 }
 
 .dropdown,
@@ -217,10 +230,15 @@ input[type=checkbox] + label::before {
   float: right;
 }
 
+#charlist {
+  margin-bottom: 2em;
+}
+
 #charlist table {
   border-collapse: collapse;
   width: 100%;
   clear: both;
+  box-shadow: 0 0 15px 9px #fafafa;
 }
 
 #charlist td {
@@ -247,6 +265,10 @@ input[type=checkbox] + label::before {
 
 #charlist td.name {
   text-transform: capitalize;
+}
+
+#charlist tr {
+  background-color: #fafafa;
 }
 
 #charlist tr:nth-child(even) {
@@ -340,6 +362,7 @@ td.char span {
 
   .dropdown {
     width: 20em;
+    display: inline-block;
   }
 
   .dropdown dd {
