@@ -61,35 +61,43 @@ exports.search = function (req, res) {
   // Also, with no block ID specified in a search, we return the block name and
   // ID so it can be linked to in the HTML result.
 
-  if (blockId < 1) {
+  // If searching for a single character, match against its code.
+  if (charName.length === 1) {
+    where = 'chars.code = $1 ORDER BY code';
+    queryParams = [charName.charCodeAt(0)];
     select = selectWithBlock;
-  }
 
-  if (blockId) {
-    // Real block ID.
-    if (charName) {
-      if (blockId === -1) {
-        // Char name and 'WGL4' meta-block.
-        where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code';
-        queryParams = ['%' + charName + '%', charName, decCode];
+  } else {
+    if (blockId < 1) {
+      select = selectWithBlock;
+    }
+
+    if (blockId) {
+      // Real block ID.
+      if (charName) {
+        if (blockId === -1) {
+          // Char name and 'WGL4' meta-block.
+          where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code';
+          queryParams = ['%' + charName + '%', charName, decCode];
+        } else {
+          // char name and real block ID.
+          where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND block_id = $4 ORDER BY code';
+          queryParams = ['%' + charName + '%', charName, decCode, blockId];
+        }
       } else {
-        // char name and real block ID.
-        where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND block_id = $4 ORDER BY code';
-        queryParams = ['%' + charName + '%', charName, decCode, blockId];
+        // Block ID but no char name.
+        if (blockId === -1) {
+          where = 'wgl4 = true ORDER BY code';
+        } else {
+          where = 'block_id = $1 ORDER BY code';
+          queryParams = [blockId];
+        }
       }
     } else {
-      // Block ID but no char name.
-      if (blockId === -1) {
-        where = 'wgl4 = true ORDER BY code';
-      } else {
-        where = 'block_id = $1 ORDER BY code';
-        queryParams = [blockId];
-      }
+      // No block ID, implying only char name.
+      where = 'chars.name ILIKE $1 OR chars.alt_name ILIKE $1 OR chars.html_entity ILIKE $1 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS;
+      queryParams = ['%' + charName + '%', charName, decCode];
     }
-  } else {
-    // No block ID, implying only char name.
-    where = 'chars.name ILIKE $1 OR chars.alt_name ILIKE $1 OR chars.html_entity ILIKE $1 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS;
-    queryParams = ['%' + charName + '%', charName, decCode];
   }
 
   console.log((new Date()) + '\t', req.ip, 'WHERE ' + where + ';\t', queryParams);

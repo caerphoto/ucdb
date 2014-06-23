@@ -13,28 +13,7 @@
     wgl4Only,
     charList,
 
-    //cx1, cx2,
     searchThrottle;
-
-  /*/
-  function charactersMatch(c1, c2) {
-    // Checks whether the two characters match, by comparing their rendered
-    // images. Uses a global canvas context for performance reasons, to avoid
-    // re-creating them for each character.
-    var d1, d2,
-      i;
-
-    d1 = cx1.getImageData();
-    d2 = cx2.getImageData();
-    while (i--) {
-      if (d1[i] !== d2[i]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-  /*/
 
   function selectText(element) {
     // Select the text content of the given element.
@@ -146,17 +125,6 @@
     });
   }
 
-  function searchChanged() {
-    var lastValue = searchBox.getAttribute('data-last-value');
-
-    if (searchBox.value !== lastValue) {
-      searchBox.setAttribute('data-last-value', searchBox.value);
-      return true;
-    }
-
-    return false;
-  }
-
   function toggleClass(el, className, on) {
     var classes = el.className.split(' '),
       i;
@@ -230,7 +198,10 @@
     }
   }
 
+  // Main initialisation function
+  // ---------------------------------------------------------------------------
   D.addEventListener('DOMContentLoaded', function () {
+
     blockSelect = D.querySelector('#block');
     blockList = D.querySelector('#block_list');
     searchBox = D.querySelector('#search');
@@ -257,20 +228,11 @@
       toggleClass(blockSelect.parentNode, 'open');
     }, false);
 
-    searchBox.addEventListener('keyup', function () {
-      if (searchChanged()) {
-        clearTimeout(searchThrottle);
-        searchThrottle = setTimeout(function () {
-          updateList();
-        }, 500);
-      }
-    }, false);
-
-    // Handle clicks on the (x) button
-    searchBox.addEventListener('click', function () {
-      if (searchChanged()) {
+    searchBox.addEventListener('input', function () {
+      clearTimeout(searchThrottle);
+      searchThrottle = setTimeout(function () {
         updateList();
-      }
+      }, 500);
     }, false);
 
     blockOnly.addEventListener('change', function () {
