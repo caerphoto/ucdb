@@ -41,8 +41,7 @@ exports.search = function (req, res) {
     select = 'SELECT code, code_hex, name, alt_name, wgl4, html_entity, COUNT(code) OVER () AS count FROM chars WHERE ',
     selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id, COUNT(code) OVER () AS count FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
     where,
-    charName = (req.query.name || '').toUpperCase(),
-    hexCode = charName.toLowerCase(),
+    charName = req.query.name || '',
     decCode = parseInt(charName, 10) || -1,
     blockId = +(req.query.block_id || '');
 
@@ -71,12 +70,12 @@ exports.search = function (req, res) {
     if (charName) {
       if (blockId === -1) {
         // Char name and 'WGL4' meta-block.
-        where = '(chars.name LIKE $1 OR alt_name LIKE $1 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code';
-        queryParams = ['%' + charName + '%', hexCode, decCode];
+        where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code';
+        queryParams = ['%' + charName + '%', charName, decCode];
       } else {
         // char name and real block ID.
-        where = '(chars.name LIKE $1 OR alt_name LIKE $1 OR code_hex = $2 OR code = $3) AND block_id = $4 ORDER BY code';
-        queryParams = ['%' + charName + '%', hexCode, decCode, blockId];
+        where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND block_id = $4 ORDER BY code';
+        queryParams = ['%' + charName + '%', charName, decCode, blockId];
       }
     } else {
       // Block ID but no char name.
@@ -89,8 +88,8 @@ exports.search = function (req, res) {
     }
   } else {
     // No block ID, implying only char name.
-    where = 'chars.name LIKE $1 OR chars.alt_name LIKE $1 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS;
-    queryParams = ['%' + charName + '%', hexCode, decCode];
+    where = 'chars.name ILIKE $1 OR chars.alt_name ILIKE $1 OR chars.html_entity ILIKE $1 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS;
+    queryParams = ['%' + charName + '%', charName, decCode];
   }
 
   console.log((new Date()) + '\t', req.ip, 'WHERE ' + where + ';\t', queryParams);

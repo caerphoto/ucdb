@@ -1,11 +1,7 @@
 /*jshint node:true */
 var pg = require('pg.js'),
-  db = new pg.Client({
-    user:     "unicodedb",
-    database: "unicodedb",
-    host:     "localhost",
-    password: "reaction cherry"
-  });
+  config = JSON.parse(require('fs').readFileSync('config.json')),
+  db = new pg.Client(config.db);
 
 db.connect(function (err) {
   if (err) {
