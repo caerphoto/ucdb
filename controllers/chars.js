@@ -3,6 +3,7 @@
 var pg = require('pg.js'),
   config = JSON.parse(require('fs').readFileSync('config.json')),
   db = new pg.Client(config.db),
+  ucs2 = require('punycode').ucs2,
 
   MAX_RESULTS = 500;
 
@@ -34,21 +35,80 @@ exports.blocks = function (req, res) {
   });
 };
 
+function initQuery(ch, block) {
+  var select = 'SELECT code, code_hex, name, alt_name, wgl4, html_entity, COUNT(code) OVER () AS count FROM chars WHERE ',
+    selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id, COUNT(code) OVER () AS count FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
+
+    chars,
+    decCode;
+
+  ch = ch || '';
+  block = +(block || '');
+  decCode = parseInt(ch, 10) || -1;
+
+  chars = ucs2.decode(ch);
+
+  // Simplest case: match single character.
+  if (chars.length === 1) {
+    return {
+      select: selectWithBlock + 'chars.code = $1',
+      params: [chars[0]]
+    };
+  }
+
+  // No block ID (implied: char name is not blank).
+  if (block === 0) {
+    return {
+      select: selectWithBlock + 'chars.name ILIKE $1 OR chars.alt_name ILIKE $1 OR chars.html_entity ILIKE $1 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS,
+      params: ['%' + ch + '%', ch, decCode]
+    };
+  }
+
+  // No character given but...
+  if (ch === '') {
+
+    // ...WGL4 meta-block given.
+    if (block === -1) {
+      return {
+        select: selectWithBlock + 'wgl4 = true ORDER BY code',
+        params: []
+      };
+    }
+
+    // ...real block ID given.
+    return {
+      select: select + 'block_id = $1 ORDER BY code',
+      params: [block]
+    };
+  }
+
+  // Char name given and...
+  if (block === -1) {
+    // ...WGL4 meta-block given.
+    return {
+      select: selectWithBlock + '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code',
+      params: ['%' + ch + '%', ch, decCode]
+    };
+  }
+
+  // ...char name and real block given.
+  return {
+    select: select + '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND block_id = $4 ORDER BY code',
+    params: ['%' + ch + '%', ch, decCode, block]
+  };
+}
+
 exports.search = function (req, res) {
   // Returns JSON array of characters based on given search criteria.
 
-  var queryParams = [],
-    select = 'SELECT code, code_hex, name, alt_name, wgl4, html_entity, COUNT(code) OVER () AS count FROM chars WHERE ',
-    selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id, COUNT(code) OVER () AS count FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
-    where,
-    charName = req.query.name || '',
-    decCode = parseInt(charName, 10) || -1,
-    blockId = +(req.query.block_id || '');
+  var query;
 
   // If both name and block_id are missing, we don't know what to search for.
-  if (!charName && !blockId) {
+  if (!req.query.name && !req.query.block_id) {
     return res.send(400);
   }
+
+  query = initQuery(req.query.name, req.query.block_id);
 
   // There are three potential search types:
   // - name but no block ID
@@ -62,47 +122,11 @@ exports.search = function (req, res) {
   // ID so it can be linked to in the HTML result.
 
   // If searching for a single character, match against its code.
-  if (charName.length === 1) {
-    where = 'chars.code = $1 ORDER BY code';
-    queryParams = [charName.charCodeAt(0)];
-    select = selectWithBlock;
+  // First, check if character is outside Basic Multilingual Plane.
 
-  } else {
-    if (blockId < 1) {
-      select = selectWithBlock;
-    }
+  console.log((new Date()) + '\t', req.ip, query.select.split('WHERE')[1] + ';\t', query.params, req.query.name);
 
-    if (blockId) {
-      // Real block ID.
-      if (charName) {
-        if (blockId === -1) {
-          // Char name and 'WGL4' meta-block.
-          where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code';
-          queryParams = ['%' + charName + '%', charName, decCode];
-        } else {
-          // char name and real block ID.
-          where = '(chars.name ILIKE $1 OR alt_name ILIKE $1 OR html_entity ILIKE $1 OR code_hex = $2 OR code = $3) AND block_id = $4 ORDER BY code';
-          queryParams = ['%' + charName + '%', charName, decCode, blockId];
-        }
-      } else {
-        // Block ID but no char name.
-        if (blockId === -1) {
-          where = 'wgl4 = true ORDER BY code';
-        } else {
-          where = 'block_id = $1 ORDER BY code';
-          queryParams = [blockId];
-        }
-      }
-    } else {
-      // No block ID, implying only char name.
-      where = 'chars.name ILIKE $1 OR chars.alt_name ILIKE $1 OR chars.html_entity ILIKE $1 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS;
-      queryParams = ['%' + charName + '%', charName, decCode];
-    }
-  }
-
-  console.log((new Date()) + '\t', req.ip, 'WHERE ' + where + ';\t', queryParams);
-
-  db.query(select + where, queryParams, function (err, result) {
+  db.query(query.select, query.params, function (err, result) {
     var chars, count;
 
     if (err || !result) {
