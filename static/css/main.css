@@ -205,12 +205,14 @@ p, label, h1, h2 {
 }
 
 #search {
+  box-sizing: content-box;
   display: inline-block;
   font: inherit;
   border: 1px solid #aaa;
   border-radius: 0;
   padding: 0.2em 0 0.2em 0.5em;
   width: 17em;
+  height: 1.5em;
   line-height: 1.5;
   -webkit-appearance: none;
 }
