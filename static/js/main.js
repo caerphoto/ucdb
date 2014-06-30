@@ -312,7 +312,7 @@
     }, false);
 
     wgl4Only.addEventListener('change', function () {
-      toggleClass(charList, 'wgl4-only', wgl4Only.checked);
+      renderList();
       setHashFromState(true);
     }, false);
 

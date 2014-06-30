@@ -245,14 +245,6 @@ input[type=checkbox] + label::before {
   box-shadow: 0 0 15px 9px #fafafa;
 }
 
-#charlist.wgl4-only tbody > tr {
-  display: none;
-}
-
-#charlist.wgl4-only tbody > tr.wgl4 {
-  display: table-row;
-}
-
 #charlist td {
   border-color: #ddd;
   border-width: 0 1px;
