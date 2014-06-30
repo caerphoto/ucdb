@@ -245,11 +245,11 @@ input[type=checkbox] + label::before {
   box-shadow: 0 0 15px 9px #fafafa;
 }
 
-#charlist.wgl4-only tr {
+#charlist.wgl4-only tbody > tr {
   display: none;
 }
 
-#charlist.wgl4-only tr.wgl4 {
+#charlist.wgl4-only tbody > tr.wgl4 {
   display: table-row;
 }
 
