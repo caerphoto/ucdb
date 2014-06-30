@@ -13,8 +13,8 @@
     </tr>
   </thead>
   <tbody>
-{{#each characters}}
-    <tr>
+  {{#each characters}}
+    <tr {{#if wgl4}}class="wgl4"{{/if}}>
       <td class="char"><span>{{{char}}}</span></td>
       <td class="dec">{{code}}</td>
       <td class="hex">{{hexCode}}</td>
@@ -31,6 +31,6 @@
       <td class="block"><a href="#{{blockId}}">{{block}}</a></td>
       {{/if}}
     </tr>
-{{/each}}
+  {{/each}}
   </tbody>
 </table>

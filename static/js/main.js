@@ -13,17 +13,19 @@
     wgl4Only,
     charList,
 
+    gCacheIsValid = false,
+
     searchThrottle;
 
   function selectText(element) {
-    // Select the text content of the given element.
+    // Select the text content of the given element. 
     var range, selection;
 
-    if (D.body.createTextRange) { // ms
+    if (D.body.createTextRange) { // IE
       range = D.body.createTextRange();
       range.moveToElementText(element);
       range.select();
-    } else if (window.getSelection) { // moz, opera, webkit
+    } else if (window.getSelection) { // Moz, Opera, Webkit
       selection = window.getSelection();
       range = D.createRange();
       range.selectNodeContents(element);
@@ -32,11 +34,12 @@
     }
   }
 
-  function encodeObject(o) {
+  function queryStringFromObject(o) {
     // Converts the given object to URL query style, e.g.
     // { name: 'Andy', email: 'ucdb@andyf.me' }
     // becomes:
-    //
+    // ?name=Andy&email=ucdb%40andyf.me
+
     var q = [];
 
     Object.keys(o).forEach(function (key) {
@@ -63,7 +66,7 @@
     }, false);
 
     xhr.open('GET', url +
-      encodeObject({ block_id: blockId, name: searchString }), true);
+      queryStringFromObject({ block_id: blockId, name: searchString }), true);
 
 
     charList.className = 'loading';
@@ -193,9 +196,56 @@
       el.className = 'selected';
       blockSelect.setAttribute('data-value', id);
       blockSelect.innerHTML = UCDB.blockLookup[id];
-    } else {
-      window.location.hash = '-1';
     }
+  }
+
+  function setStateFromHash() {
+    /* Hash is of the form ':block_id/:search_term/:flags', where:
+       - search_term is URI encoded
+       - flags contains any of 'b' and 'w', meaning block-only and WGL4-only
+         respectively
+    */
+
+    var hash = window.location.hash.split('#')[1],
+      BLOCK_ONLY = /b/,
+      WGL4_ONLY = /w/;
+
+    hash = hash.split('/');
+
+    setSelectValue(hash[0]);
+
+    if (hash.length !== 3) {
+      setHashFromState(true);
+    } else {
+      searchBox.value = decodeURIComponent(hash[1]);
+      blockOnly.checked = BLOCK_ONLY.test(hash[2]);
+      wgl4Only.checked = WGL4_ONLY.test(hash[2]);
+    }
+
+    if (!gCacheIsValid) {
+      updateList();
+    }
+  }
+
+  function setHashFromState(clientOnly) {
+    // Setting gCacheIsValid to true will prevent the hashchange event handler
+    // from calling updateList() - this is helpful if we just want to change the
+    // hash without making a query to the server, such as when toggling the
+    // WGL4-only checkbox.
+    if (clientOnly) {
+      gCacheIsValid = true;
+    }
+
+    window.location.hash = [
+      blockSelect.getAttribute('data-value'),
+      encodeURIComponent(searchBox.value),
+      (blockOnly.checked ? 'b' : '') + (wgl4Only.checked ? 'w' : '')
+    ].join('/');
+
+    window.setTimeout(function () {
+      gCacheIsValid = false;
+    }, 0);
+
   }
 
   // Main initialisation function
@@ -210,9 +260,14 @@
     excludeMissing = {};//D.querySelector('#exclude_missing');
     charList = D.querySelector('#charlist');
 
+    blockList.innerHTML = tmpl.blocklist({ blocks: UCDB.blocks });
+
     if (window.location.hash) {
-      setSelectValue(window.location.hash.split('#')[1]);
+      setStateFromHash();
+    } else {
+      setHashFromState();
     }
+
     updateList();
     searchBox.focus();
 
@@ -220,26 +275,39 @@
       toggleClass(this.parentNode, 'open');
     });
 
+    // --- These four events change state ---
     blockList.addEventListener('click', function (evt) {
       var el = evt.target;
 
       blockOnly.checked = true;
       setSelectValue(el.getAttribute('href').split('#')[1]);
+      setHashFromState();
       toggleClass(blockSelect.parentNode, 'open');
+
+      evt.preventDefault();
     }, false);
 
     searchBox.addEventListener('input', function () {
       clearTimeout(searchThrottle);
       searchThrottle = setTimeout(function () {
+        setHashFromState();
         updateList();
       }, 500);
     }, false);
 
     blockOnly.addEventListener('change', function () {
+      setHashFromState();
       if (searchBox.value) {
         updateList();
       }
     }, false);
+
+    wgl4Only.addEventListener('change', function () {
+      toggleClass(charList, 'wgl4-only', wgl4Only.checked);
+      setHashFromState(true);
+    }, false);
+
+    // --------------------------------------
 
     D.addEventListener('click', function (evt) {
       if (!hasClass(evt.target.parentNode, 'dropdown')) {
@@ -247,16 +315,7 @@
       }
     }, false);
 
-    wgl4Only.addEventListener('change', function () {
-      renderList();
-    }, false);
-
-    window.addEventListener('hashchange', function () {
-      var hash = window.location.hash.split('#')[1];
-      setSelectValue(hash);
-      blockOnly.checked = true;
-      updateList();
-    });
+    window.addEventListener('hashchange', setStateFromHash);
 
     charList.addEventListener('click', function (evt) {
       var el = evt.target,

@@ -31,11 +31,7 @@
         <dl class="dropdown">
           <dt id="block" data-value="-1">WGL4 meta-block</dt>
           <dd>
-            <nav id="block_list">
-              <a href="#-1" class="selected">WGL4 meta-block</a>
-              {{#each blocks}}<a href="#{{id}}">{{name}}</a>
-              {{/each}}
-            </nav>
+            <nav id="block_list"></nav>
           </dd>
         </dl>
 
@@ -48,7 +44,6 @@
           UCDB.blocks.forEach(function (block) {
             UCDB.blockLookup[block.id] = block.name;
           });
-          delete UCDB.blocks;
         </script>
 
         <br>
@@ -74,7 +69,6 @@
 
     <script src="/js/lib/handlebars.runtime-v1.3.0.js"></script>
     <script src="/js/templates.js"></script>
-    <!--<script src="http://andyf.me/js/randomcharbg.js"></script>-->
     <script src="/js/randomcharbg.js"></script>
     <script src="/js/main.js"></script>
   </body>
