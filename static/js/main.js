@@ -271,11 +271,20 @@
     updateList();
     searchBox.focus();
 
+    window.addEventListener('hashchange', setStateFromHash);
+
+    // Close dropdown on click anywhere on the page.
+    D.addEventListener('click', function (evt) {
+      if (!hasClass(evt.target.parentNode, 'dropdown')) {
+        removeClass(blockSelect.parentNode, 'open', false);
+      }
+    }, false);
+
     blockSelect.addEventListener('click', function () {
       toggleClass(this.parentNode, 'open');
     });
 
-    // --- These four events change state ---
+    // --- The rest of these events change state ---
     blockList.addEventListener('click', function (evt) {
       var el = evt.target;
 
@@ -307,19 +316,18 @@
       setHashFromState(true);
     }, false);
 
-    // --------------------------------------
-
-    D.addEventListener('click', function (evt) {
-      if (!hasClass(evt.target.parentNode, 'dropdown')) {
-        removeClass(blockSelect.parentNode, 'open', false);
-      }
-    }, false);
-
-    window.addEventListener('hashchange', setStateFromHash);
-
     charList.addEventListener('click', function (evt) {
       var el = evt.target,
         parent = el.parentNode;
+
+      if (el.nodeName === 'A') {
+        blockOnly.checked = true;
+        setSelectValue(el.getAttribute('href').split('#')[1]);
+        setHashFromState();
+
+        evt.preventDefault();
+        return;
+      }
 
       if (parent.nodeName === 'TD' && parent.className === 'char') {
         // iOS won't show the element as selected unless contentEditable is true
