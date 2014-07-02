@@ -212,6 +212,7 @@
 
     hash = hash.split('/');
 
+    // Try to use block ID, for backwards compatibility with old URLs.
     setSelectValue(hash[0]);
 
     if (hash.length !== 3) {
@@ -265,7 +266,7 @@
     if (window.location.hash) {
       setStateFromHash();
     } else {
-      setHashFromState();
+      setHashFromState(true);
     }
 
     updateList();
