@@ -18,6 +18,9 @@ db.on('notice', function (notice) {
 db.connect();
 
 exports.blocks = function (req, res) {
+
+  db.query('UPDATE analytics SET count = count + 1');
+
   // Looks up the list of blocks, then renders the homepage.
   db.query('SELECT name, id FROM blocks ORDER BY name', function (err, result) {
 
