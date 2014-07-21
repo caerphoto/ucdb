@@ -18,7 +18,7 @@
     searchThrottle;
 
   function selectText(element) {
-    // Select the text content of the given element. 
+    // Select the text content of the given element.
     var range, selection;
 
     if (D.body.createTextRange) { // IE
@@ -300,8 +300,9 @@
     searchBox.addEventListener('input', function () {
       clearTimeout(searchThrottle);
       searchThrottle = setTimeout(function () {
+        // No need to explicitly update the list, since it happens when the hash
+        // is changed anyway.
         setHashFromState();
-        updateList();
       }, 500);
     }, false);
 
