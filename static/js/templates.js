@@ -40,10 +40,7 @@ function program1(depth0,data) {
 function program3(depth0,data,depth1) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n    <tr ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.wgl4), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n      <td class=\"char\"><span>";
+  buffer += "\n    <tr>\n      <td class=\"char\"><span>";
   if (helper = helpers['char']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['char']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
@@ -56,31 +53,25 @@ function program3(depth0,data,depth1) {
   else { helper = (depth0 && depth0.hexCode); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "</td>\n      <td class=\"entity\">";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.htmlEntity), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.htmlEntity), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "</td>\n      <td class=\"name\">\n        ";
   if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.altName), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.altName), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.wgl4), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.wgl4), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n      </td>\n\n      ";
-  stack1 = helpers['if'].call(depth0, (depth1 && depth1.showBlock), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth1 && depth1.showBlock), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n    </tr>\n  ";
   return buffer;
   }
 function program4(depth0,data) {
-  
-  
-  return "class=\"wgl4\"";
-  }
-
-function program6(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "&amp;";
@@ -91,7 +82,7 @@ function program6(depth0,data) {
   return buffer;
   }
 
-function program8(depth0,data) {
+function program6(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\n          (";
@@ -102,13 +93,13 @@ function program8(depth0,data) {
   return buffer;
   }
 
-function program10(depth0,data) {
+function program8(depth0,data) {
   
   
   return "<span>(✓<span class=\"large-screen\"> in WGL4</span>)</span>";
   }
 
-function program12(depth0,data) {
+function program10(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\n      <td class=\"block\"><a href=\"#";

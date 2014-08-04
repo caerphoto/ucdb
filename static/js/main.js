@@ -93,9 +93,7 @@
     if (charCache.length === 0) {
       charList.innerHTML = tmpl.no_result();
     } else {
-      if (charCache[0].block) {
-        view.showBlock = true;
-      }
+      view.showBlock = !blockOnly.checked;
       charList.innerHTML = tmpl.charlist(view);
     }
   }
@@ -307,7 +305,7 @@
     }, false);
 
     blockOnly.addEventListener('change', function () {
-      setHashFromState();
+      setHashFromState(true);
       if (searchBox.value) {
         updateList();
       }

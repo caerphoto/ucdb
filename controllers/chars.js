@@ -39,8 +39,9 @@ exports.blocks = function (req, res) {
 };
 
 function buildQuery(ch, block) {
-  var select = 'SELECT code, code_hex, name, alt_name, wgl4, html_entity, COUNT(code) OVER () AS count FROM chars WHERE ',
-    selectWithBlock = 'SELECT chars.code, chars.code_hex, chars.name, chars.alt_name, chars.wgl4, chars.html_entity, blocks.name AS block, blocks.id AS block_id, COUNT(code) OVER () AS count FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
+  // Note: some aliases are enclosed in double quotes because otherwise they'd
+  // be converted to lowercase by Postgres.
+  var select = 'SELECT CASE chars.name WHEN \'<control>\' THEN \'\' ELSE \'&#\' || code || \';\' END AS char, chars.code, chars.code_hex AS "hexCode", chars.name, chars.alt_name AS "altName", chars.wgl4, chars.html_entity AS "htmlEntity", blocks.name AS block, blocks.id AS "blockId", CAST(COUNT(code) OVER () AS integer) AS count FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE ',
 
     chars,
     decCode;
@@ -69,7 +70,7 @@ function buildQuery(ch, block) {
   // Simplest case: match single character.
   if (chars.length === 1) {
     return {
-      select: selectWithBlock + 'chars.code = $1',
+      select: select + 'chars.code = $1',
       params: [chars[0]],
       searchType: 'single character'
     };
@@ -80,7 +81,7 @@ function buildQuery(ch, block) {
   // No block ID (implied: char name is not blank).
   if (block === 0) {
     return {
-      select: selectWithBlock + 'chars.name LIKE $1 OR chars.alt_name LIKE $1 OR chars.html_entity = $2 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS,
+      select: select + 'chars.name LIKE $1 OR chars.alt_name LIKE $1 OR chars.html_entity = $2 OR chars.code_hex = $2 OR chars.code = $3 ORDER BY code LIMIT ' + MAX_RESULTS,
       params: ['%' + ch + '%', ch, decCode],
       searchType: 'name only'
     };
@@ -92,7 +93,7 @@ function buildQuery(ch, block) {
     // ...WGL4 meta-block given.
     if (block === -1) {
       return {
-        select: selectWithBlock + 'wgl4 = true ORDER BY code',
+        select: select + 'wgl4 = true ORDER BY code',
         params: [],
         searchType: 'block only (WGL4)'
       };
@@ -110,7 +111,7 @@ function buildQuery(ch, block) {
   if (block === -1) {
     // ...WGL4 meta-block given.
     return {
-      select: selectWithBlock + '(chars.name LIKE $1 OR alt_name LIKE $1 OR html_entity = $2 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code',
+      select: select + '(chars.name LIKE $1 OR alt_name LIKE $1 OR html_entity = $2 OR code_hex = $2 OR code = $3) AND wgl4 = true ORDER BY code',
       params: ['%' + ch + '%', ch, decCode],
       searchType: 'name and WGL4'
     };
@@ -128,7 +129,7 @@ exports.search = function (req, res) {
   // Returns JSON array of characters based on given search criteria.
 
   var query,
-    startTime = Date.now();
+    startTime = process.hrtime();
 
   // If both name and block_id are missing, we don't know what to search for.
   if (!req.query.name && !req.query.block_id) {
@@ -138,7 +139,7 @@ exports.search = function (req, res) {
   query = buildQuery(req.query.name, req.query.block_id);
 
   db.query(query.select, query.params, function (err, result) {
-    var chars, count;
+    var endTime;
 
     if (err || !result) {
       db.end();
@@ -150,42 +151,15 @@ exports.search = function (req, res) {
       return res.send(404, { chars:[], count: 0 });
     }
 
-    count = parseInt(count = result.rows[0].count, 10);
+    endTime = (process.hrtime(startTime)[1] / 1000000).toFixed(2);
 
-    if (result.rows[0].block_id) {
-      chars = result.rows.map(function (char) {
-        return {
-          char: char.name === '<control>' ? '' : '&#' + char.code,
-          code: char.code,
-          hexCode: char.code_hex,
-          name: char.name || '',
-          altName: char.alt_name || '',
-          wgl4: char.wgl4,
-          htmlEntity: char.html_entity,
-          block: char.block,
-          blockId: char.block_id
-        };
-      });
-    } else {
-      chars = result.rows.map(function (char) {
-        return {
-          char: char.name === '<control>' ? '' : '&#' + char.code,
-          code: char.code,
-          hexCode: char.code_hex,
-          name: char.name || '',
-          altName: char.alt_name || '',
-          wgl4: char.wgl4,
-          htmlEntity: char.html_entity
-        };
-      });
-    }
-
-    res.send({ chars: chars, count: count });
     if (query.searchType === 'single character') {
-      console.log([(new Date()).toISOString(), req.ip, query.searchType, JSON.stringify(query.params.concat([req.query.name])), (Date.now() - startTime) + 'ms'].join('\t'));
+      console.log([(new Date()).toISOString(), req.ip, query.searchType, JSON.stringify(query.params.concat([req.query.name])), endTime + 'ms'].join('\t'));
     } else {
-      console.log([(new Date()).toISOString(), req.ip, query.searchType, JSON.stringify(query.params), (Date.now() - startTime) + 'ms'].join('\t'));
+      console.log([(new Date()).toISOString(), req.ip, query.searchType, JSON.stringify(query.params), endTime + 'ms'].join('\t'));
     }
+
+    res.send({ chars: result.rows, count: result.rows[0].count });
   });
 
 };
