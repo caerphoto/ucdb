@@ -9,7 +9,7 @@
     blockList,
     searchBox,
     blockOnly,
-    excludeMissing,
+    //excludeMissing,
     wgl4Only,
     charList,
 
@@ -106,12 +106,13 @@
     }
 
     fetchChars(blockId, searchBox.value, function (err, data) {
-      var cv1, cv2, cx1, cx2;
+      //var cv1, cv2, cx1, cx2;
 
       if (err) {
         return alert(err);
       }
 
+      /*/
       if (excludeMissing.checked) {
         cv1 = D.createElement('canvas');
         cv2 = D.createElement('canvas');
@@ -119,6 +120,7 @@
         cx2 = cv2.getContext('2d');
 
       }
+      //*/
 
       charCache = data.chars;
       searchCount = data.count;
@@ -256,7 +258,7 @@
     searchBox = D.querySelector('#search');
     blockOnly = D.querySelector('#block_only');
     wgl4Only = D.querySelector('#wgl4_only');
-    excludeMissing = {};//D.querySelector('#exclude_missing');
+    //excludeMissing = {};//D.querySelector('#exclude_missing');
     charList = D.querySelector('#charlist');
 
     blockList.innerHTML = tmpl.blocklist({ blocks: UCDB.blocks });
@@ -264,10 +266,9 @@
     if (window.location.hash) {
       setStateFromHash();
     } else {
-      setHashFromState(true);
+      setHashFromState();
     }
 
-    updateList();
     searchBox.focus();
 
     window.addEventListener('hashchange', setStateFromHash);
