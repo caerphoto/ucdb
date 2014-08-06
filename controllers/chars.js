@@ -167,9 +167,16 @@ exports.search = function (req, res) {
 
       endTime = (process.hrtime(startTime)[1] / 1000000).toFixed(2);
 
-      if (query.searchType === 'single character') {
+      switch (query.searchType) {
+      case 'single character':
         logParam = JSON.stringify(query.params.concat([req.query.name]));
-      } else{
+        break;
+      case 'block only':
+      case 'name and block':
+        logParam = JSON.stringify(query.params) +
+          ' (' + result.rows[0].block + ')';
+        break;
+      default:
         logParam = JSON.stringify(query.params);
       }
 
