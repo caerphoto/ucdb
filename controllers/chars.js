@@ -174,7 +174,9 @@ exports.search = function (req, res) {
       case 'block only':
       case 'name and block':
         logParam = JSON.stringify(query.params) +
-          ' (' + result.rows[0].block + ')';
+          ' (' + (result.rows.length ?
+            result.rows[0].block :
+            '?') + ')';
         break;
       default:
         logParam = JSON.stringify(query.params);
