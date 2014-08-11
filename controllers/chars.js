@@ -8,27 +8,37 @@ var pg = require('pg'),
   // The more unwieldy SQL strings are in their own files:
   SQL = {
     select: fs.readFileSync('assets/select.sql') + ' ',
-    blocks: 'SELECT name, id FROM blocks ORDER BY name',
-    where: {
-      all: fs.readFileSync('assets/where_all.sql') + ' ' + MAX_RESULTS,
-      wgl4: fs.readFileSync('assets/where_wgl4.sql'),
-      block: fs.readFileSync('assets/where_block.sql')
-    }
+    blocks: 'SELECT name, id FROM blocks ORDER BY name'
   },
-  ucs2 = require('punycode').ucs2;
+  ucs2 = require('punycode').ucs2,
 
-/*
-db.on('error', function (err) {
-  console.log('Database error:', err);
+  blocks = {
+    '': '<no block>',
+    '-1': 'WGL4'
+  },
+  chars;
+
+
+// Load all characters into memory.
+pg.connect(config, function (err, client, done) {
+  if (err) {
+    console.log('Error connecting to DB', err);
+    return done(client);
+  }
+
+  client.query(SQL.select, function (err, result) {
+    if (err) {
+      console.log('Error loading characters from DB', err);
+      return done(client);
+    }
+
+    console.log('Successfully loaded characters from DB');
+    chars = result.rows;
+    done();
+  });
 });
 
-db.on('notice', function (notice) {
-  console.log('Database notice:', notice);
-});
-*/
-
-exports.blocks = function (req, res) {
-
+exports.index = function (req, res) {
   pg.connect(config, function (err, client, done) {
     client.query('UPDATE analytics SET count = count + 1');
 
@@ -43,6 +53,11 @@ exports.blocks = function (req, res) {
 
       done();
 
+      // Build block name lookup, for nicer query logging.
+      result.rows.forEach(function (row) {
+        blocks[row.id.toString()] = row.name;
+      });
+
       res.render('index', {
         title: 'Unicode Character Database',
         blocks: result.rows,
@@ -53,21 +68,29 @@ exports.blocks = function (req, res) {
   });
 };
 
-function buildQuery(ch, block) {
-  // Note: some aliases are enclosed in double quotes because otherwise they'd
-  // be converted to lowercase by Postgres.
+function filterResults(rows, ch, block) {
+  var charCodes,
+    decCode,
+    result,
+    re;
 
-  var chars,
-    decCode;
+  function testRow(row) {
+    return (
+      re.test(row.name) ||
+      re.test(row.altName) ||
+      row.htmlEntity === ch ||
+      row.hexCode === ch ||
+      row.code === decCode
+    );
+  }
 
-  ch = ch || '';
-  block = +(block || '');
+  block = (block || '');
   decCode = parseInt(ch, 10) || -1;
 
   // Convert JavaScript string (UCS-2 encoding) into an array of numbers
   // representing Unicode code points, because String.charCodeAt() only works on
   // single-byte characters.
-  chars = ucs2.decode(ch);
+  charCodes = ucs2.decode(ch);
 
   // There are four potential search types:
   // - literal character
@@ -75,30 +98,23 @@ function buildQuery(ch, block) {
   // - name and block ID
   // - block ID but no name
 
-  // When searching with no block ID, the output must be limited otherwise we
-  // might end up returning tens of thousands of characters, and the browser
-  // won't like rendering a list that big. TODO: pagination!
-  // Also, with no block ID specified in a search, we return the block name and
-  // ID so it can be linked to in the HTML result.
-
   // Simplest case: match single character.
-  if (chars.length === 1) {
-    return {
-      sql: SQL.select + 'chars.code = $1',
-      params: [chars[0]],
-      searchType: 'single character'
-    };
+  if (charCodes.length === 1) {
+    rows.some(function (row) {
+      if (row.code === charCodes[0]) {
+        result = [row];
+        return true;
+      }
+    });
+    return result;
   }
 
-  ch = ch.toLowerCase();
+  ch = (ch || '').toLowerCase();
+  re = new RegExp(ch);
 
-  // No block ID (implied: char name is not blank).
-  if (block === 0) {
-    return {
-      sql: SQL.select + SQL.where.all,
-      params: ['%' + ch + '%', ch, decCode],
-      searchType: 'name only'
-    };
+  // Find by name, but no block ID
+  if (block === '') {
+    return rows.filter(testRow);
   }
 
   // No character given but...
@@ -106,97 +122,70 @@ function buildQuery(ch, block) {
 
     // ...WGL4 meta-block given.
     if (block === -1) {
-      return {
-        sql: SQL.select + 'wgl4 = true ORDER BY code',
-        params: [],
-        searchType: 'block only (WGL4)'
-      };
+      return rows.filter(function (row) {
+        return row.wgl4;
+      });
     }
 
     // ...real block ID given.
-    return {
-      sql: SQL.select + 'block_id = $1 ORDER BY code',
-      params: [block],
-      searchType: 'block only'
-    };
+    return rows.filter(function (row) {
+      return row.blockId === block;
+    });
   }
 
   // Char name given and...
   if (block === -1) {
     // ...WGL4 meta-block given.
-    return {
-      sql: SQL.select + SQL.where.wgl4,
-      params: ['%' + ch + '%', ch, decCode],
-      searchType: 'name and WGL4'
-    };
+    return rows.filter(function (row) {
+      return testRow(row) && row.wgl4;
+    });
   }
 
   // ...char name and real block given.
-  return {
-    sql: SQL.select + SQL.where.block,
-    params: ['%' + ch + '%', ch, decCode, block],
-    searchType: 'name and block'
-  };
+  return rows.filter(function (row) {
+    return testRow(row) && row.blockId === block;
+  });
 }
 
 exports.search = function (req, res) {
-  // Returns JSON array of characters based on given search criteria.
+  // Returns JSON array of characters after filtering based on given search
+  // criteria.
 
-  var query,
-    startTime = process.hrtime();
+  var startTime = process.hrtime(),
+    endTime,
+
+    result = {};
 
   // If both name and block_id are missing, we don't know what to search for.
   if (!req.query.name && !req.query.block_id) {
     return res.send(400);
   }
 
-  pg.connect(config, function (err, client, done) {
-    query = buildQuery(req.query.name, req.query.block_id);
+  result.rows = filterResults(chars, req.query.name, req.query.block_id);
 
-    client.query(query.sql, query.params, function (err, result) {
-      var endTime,
-        logParam;
-
-      if (err || !result) {
-        console.log('Error selecting characters:', err);
-        done(client);
-        return res.send(500);
-      }
-
-      done();
-
-      endTime = (process.hrtime(startTime)[1] / 1000000).toFixed(2);
-
-      switch (query.searchType) {
-      case 'single character':
-        logParam = JSON.stringify(query.params.concat([req.query.name]));
-        break;
-      case 'block only':
-      case 'name and block':
-        logParam = JSON.stringify(query.params) +
-          ' (' + (result.rows.length ?
-            result.rows[0].block :
-            '?') + ')';
-        break;
-      default:
-        logParam = JSON.stringify(query.params);
-      }
-
-      console.log([
-        (new Date()).toISOString(),
-        req.ip,
-        query.searchType,
-        logParam,
-        result.rows.length ? result.rows[0].count : 0,
-        endTime + 'ms'
-      ].join('\t'));
-
-      if (result.rows.length === 0) {
-        return res.send(404, { chars:[], count: 0 });
-      }
-
-      res.send({ chars: result.rows, count: result.rows[0].count });
-    });
+  result.rows.sort(function (a, b) {
+    return a.code < b.code ? -1 : 1;
   });
 
+  result.count = result.rows.length;
+  if (result.count > MAX_RESULTS) {
+    result.rows = result.rows.slice(0, MAX_RESULTS);
+  }
+
+  endTime = (process.hrtime(startTime)[1] / 1000000).toFixed(1);
+
+  console.log([
+    (new Date()).toISOString(),
+    req.ip,
+    '"' + req.query.name + '"',
+    '"' + req.query.block_id + '" (' + blocks[req.query.block_id] + ')',
+    result.count,
+    endTime + 'ms'
+  ].join('\t'));
+
+  if (result.count === 0) {
+    return res.send(404, { chars:[], count: 0 });
+  }
+
+  res.send({ chars: result.rows, count: result.count });
 };

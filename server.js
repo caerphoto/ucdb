@@ -11,7 +11,7 @@ app.engine('handlebars', hbs());
 app.set('view engine', 'handlebars');
 app.use(express.static(__dirname + '/static'));
 
-app.get('/', controllers.chars.blocks);
+app.get('/', controllers.chars.index);
 app.get('/search', controllers.chars.search);
 
 if (process.env.NODE_ENV === 'production') {

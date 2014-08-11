@@ -11,6 +11,5 @@ SELECT CASE chars.name
     chars.wgl4,
     chars.html_entity AS "htmlEntity",
     blocks.name AS block,
-    blocks.id AS "blockId",
-    CAST(COUNT(code) OVER () AS integer) AS count
-FROM chars INNER JOIN blocks ON chars.block_id = blocks.id WHERE
+    blocks.id AS "blockId"
+FROM chars INNER JOIN blocks ON chars.block_id = blocks.id
