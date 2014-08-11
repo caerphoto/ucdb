@@ -86,14 +86,12 @@
     xhr.send();
   } // ajax()
 
-  function renderList() {
+  function renderList(clientOnly) {
     var view = {
         count: charCache.length,
         characters: charCache
       },
-      listBody,
-      tempElement = D.createElement('div'),
-      tempBody;
+      tempElement;
 
     if (currentOffset) {
       view.count += currentOffset * UCDB.pageSize;
@@ -113,20 +111,14 @@
 
     view.showBlock = !blockOnly.checked;
 
-    if (currentOffset && !wgl4Only.checked) {
-      subCharList.innerHTML = '';
-      tempElement.innerHTML = tmpl.charlist(view);
-      tempBody = tempElement.querySelector('tbody');
-      while (tempBody.firstChild) {
-        if (tempBody.firstChild.nodeName === 'TR') {
-          subCharList.appendChild(tempBody.removeChild(tempBody.firstChild));
-        } else {
-          tempBody.removeChild(tempBody.firstChild);
-        }
+    if (!clientOnly && currentOffset) {
+      tempElement = D.createElement('tbody');
+      tempElement.innerHTML = tmpl.subcharlist(view);
+      while (tempElement.firstChild) {
+        subCharList.appendChild(tempElement.removeChild(tempElement.firstChild));
       }
-      console.log(subCharList.childNodes);
-      listBody = charList.querySelector('tbody');
-      listBody.appendChild(subCharList);
+      charList.querySelector('tbody').appendChild(subCharList);
+
     } else {
       if (charCache.length === 0) {
         charList.innerHTML = tmpl.no_result();
