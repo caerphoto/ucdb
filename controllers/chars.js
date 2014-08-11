@@ -68,7 +68,7 @@ exports.index = function (req, res) {
   });
 };
 
-function filterResults(rows, ch, block) {
+function filterResults(ch, block) {
   var charCodes,
     decCode,
     result,
@@ -100,7 +100,7 @@ function filterResults(rows, ch, block) {
 
   // Simplest case: match single character.
   if (charCodes.length === 1) {
-    rows.some(function (row) {
+    chars.some(function (row) {
       if (row.code === charCodes[0]) {
         result = [row];
         return true;
@@ -114,35 +114,36 @@ function filterResults(rows, ch, block) {
 
   // Find by name, but no block ID
   if (block === '') {
-    return rows.filter(testRow);
+    return chars.filter(testRow);
   }
 
   // No character given but...
   if (ch === '') {
 
     // ...WGL4 meta-block given.
-    if (block === -1) {
-      return rows.filter(function (row) {
+    if (block === '-1') {
+      return chars.filter(function (row) {
         return row.wgl4;
       });
     }
 
     // ...real block ID given.
-    return rows.filter(function (row) {
+    return chars.filter(function (row) {
       return row.blockId === block;
     });
   }
 
   // Char name given and...
-  if (block === -1) {
+  if (block === '-1') {
     // ...WGL4 meta-block given.
-    return rows.filter(function (row) {
+
+    return chars.filter(function (row) {
       return testRow(row) && row.wgl4;
     });
   }
 
   // ...char name and real block given.
-  return rows.filter(function (row) {
+  return chars.filter(function (row) {
     return testRow(row) && row.blockId === block;
   });
 }
@@ -161,7 +162,7 @@ exports.search = function (req, res) {
     return res.send(400);
   }
 
-  result.rows = filterResults(chars, req.query.name, req.query.block_id);
+  result.rows = filterResults(req.query.name, req.query.block_id);
 
   result.rows.sort(function (a, b) {
     return a.code < b.code ? -1 : 1;
