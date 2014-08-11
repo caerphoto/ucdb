@@ -9,11 +9,12 @@
     blockList,
     searchBox,
     blockOnly,
-    //excludeMissing,
     wgl4Only,
     charList,
+    subCharList = D.createDocumentFragment(),
 
     gCacheIsValid = false,
+    currentOffset = 0,
 
     searchThrottle;
 
@@ -65,8 +66,20 @@
       }
     }, false);
 
-    xhr.open('GET', url +
-      queryStringFromObject({ block_id: blockId, name: searchString }), true);
+    if (currentOffset) {
+      xhr.open('GET', url +
+        queryStringFromObject({
+          block_id: blockId,
+          name: searchString,
+          offset: currentOffset
+        }), true);
+    } else {
+      xhr.open('GET', url +
+        queryStringFromObject({
+          block_id: blockId,
+          name: searchString
+        }), true);
+    }
 
 
     charList.className = 'loading';
@@ -77,24 +90,49 @@
     var view = {
         count: charCache.length,
         characters: charCache
-      };
+      },
+      listBody,
+      tempElement = D.createElement('div'),
+      tempBody;
 
-    if (view.count !== searchCount) {
+    if (currentOffset) {
+      view.count += currentOffset * UCDB.pageSize;
+    }
+
+    if (view.count < searchCount) {
       view.count = charCache.length + ' of ' + searchCount + ' matching';
+      view.canPaginate = true;
     }
 
     if (wgl4Only.checked) {
-      view.characters = charCache.filter(function (char) {
-        return !!char.wgl4;
+      view.characters = charCache.filter(function (ch) {
+        return !!ch.wgl4;
       });
       view.count = view.characters.length + ' of ' + charCache.length;
     }
 
-    if (charCache.length === 0) {
-      charList.innerHTML = tmpl.no_result();
+    view.showBlock = !blockOnly.checked;
+
+    if (currentOffset && !wgl4Only.checked) {
+      subCharList.innerHTML = '';
+      tempElement.innerHTML = tmpl.charlist(view);
+      tempBody = tempElement.querySelector('tbody');
+      while (tempBody.firstChild) {
+        if (tempBody.firstChild.nodeName === 'TR') {
+          subCharList.appendChild(tempBody.removeChild(tempBody.firstChild));
+        } else {
+          tempBody.removeChild(tempBody.firstChild);
+        }
+      }
+      console.log(subCharList.childNodes);
+      listBody = charList.querySelector('tbody');
+      listBody.appendChild(subCharList);
     } else {
-      view.showBlock = !blockOnly.checked;
-      charList.innerHTML = tmpl.charlist(view);
+      if (charCache.length === 0) {
+        charList.innerHTML = tmpl.no_result();
+      } else {
+        charList.innerHTML = tmpl.charlist(view);
+      }
     }
   }
 
@@ -105,25 +143,18 @@
       blockId = '';
     }
 
-    fetchChars(blockId, searchBox.value, function (err, data) {
-      //var cv1, cv2, cx1, cx2;
+    fetchChars(blockId, searchBox.value, function (err, result) {
 
       if (err) {
         return alert(err);
       }
 
-      /*/
-      if (excludeMissing.checked) {
-        cv1 = D.createElement('canvas');
-        cv2 = D.createElement('canvas');
-        cx1 = cv1.getContext('2d');
-        cx2 = cv2.getContext('2d');
-
+      if (currentOffset) {
+        charCache.concat(result.chars);
+      } else {
+        charCache = result.chars;
       }
-      //*/
-
-      charCache = data.chars;
-      searchCount = data.count;
+      searchCount = result.count;
       renderList();
     });
   }
@@ -210,6 +241,10 @@
       BLOCK_ONLY = /b/,
       WGL4_ONLY = /w/;
 
+    // If state has changed, the whole list will need to be re-rendered, not
+    // just part of it.
+    currentOffset = 0;
+
     hash = hash.split('/');
 
     // Try to use block ID, for backwards compatibility with old URLs.
@@ -258,7 +293,6 @@
     searchBox = D.querySelector('#search');
     blockOnly = D.querySelector('#block_only');
     wgl4Only = D.querySelector('#wgl4_only');
-    //excludeMissing = {};//D.querySelector('#exclude_missing');
     charList = D.querySelector('#charlist');
 
     blockList.innerHTML = tmpl.blocklist({ blocks: UCDB.blocks });
@@ -327,6 +361,12 @@
         setHashFromState();
 
         evt.preventDefault();
+        return;
+      }
+
+      if (el.nodeName === 'BUTTON') {
+        currentOffset += 1;
+        updateList();
         return;
       }
 

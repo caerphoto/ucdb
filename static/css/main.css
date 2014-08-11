@@ -121,6 +121,7 @@ p, label, h1, h2 {
   margin-bottom: 1em;
 }
 
+button,
 .dropdown,
 .dropdown dd,
 .dropdown dt,
@@ -128,6 +129,37 @@ p, label, h1, h2 {
 .dropdown li {
   margin: 0;
   padding: 0;
+}
+
+button,
+.dropdown dt {
+  display: block;
+  border: 1px solid #aaa;
+  padding: 0.2em 0.5em;
+  cursor: pointer;
+}
+
+button {
+  font: inherit;
+  background-color: #eee;
+}
+
+button:hover {
+  background-color: #f4f4f4;
+}
+
+button:active {
+  background-color: #ddd;
+}
+
+button:focus {
+  outline: 1px dotted #0084d1;
+}
+
+
+table + button {
+  width: 10em;
+  margin: 1em auto;
 }
 
 .dropdown {
@@ -146,10 +178,6 @@ p, label, h1, h2 {
 
 .dropdown dt {
   position: relative;
-  display: block;
-  border: 1px solid #aaa;
-  padding: 0.2em 0.5em;
-  cursor: pointer;
   background: #fff;
 }
 
@@ -162,6 +190,7 @@ p, label, h1, h2 {
   line-height: 0;
 }
 
+button:hover,
 .dropdown dt:hover {
   color: #0084d1;
   border-color: #0084d1;
@@ -222,6 +251,7 @@ p, label, h1, h2 {
   outline: none;
 }
 
+button,
 .dropdown dt,
 #search,
 input[type=checkbox] + label::before {
@@ -400,6 +430,7 @@ td.char span {
   .name span {
     font-weight: bold;
   }
+
 
 }
 

@@ -114,6 +114,12 @@ function program10(depth0,data) {
   return buffer;
   }
 
+function program12(depth0,data) {
+  
+  
+  return "\n<button class=\"pagination\">Show More</button>\n";
+  }
+
   buffer += "<h2>";
   if (helper = helpers.count) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.count); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
@@ -124,7 +130,10 @@ function program10(depth0,data) {
   buffer += "\n    </tr>\n  </thead>\n  <tbody>\n  ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.characters), {hash:{},inverse:self.noop,fn:self.programWithDepth(3, program3, data, depth0),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n  </tbody>\n</table>\n";
+  buffer += "\n  </tbody>\n</table>\n\n";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.canPaginate), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n";
   return buffer;
   });
 templates['no_result'] = template(function (Handlebars,depth0,helpers,partials,data) {

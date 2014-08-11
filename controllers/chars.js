@@ -3,7 +3,7 @@ var pg = require('pg'),
   fs = require('fs'),
   config = JSON.parse(fs.readFileSync('config.json')).db,
 
-  MAX_RESULTS = 100,
+  MAX_RESULTS = 10,
 
   // The more unwieldy SQL strings are in their own files:
   SQL = {
@@ -62,7 +62,8 @@ exports.index = function (req, res) {
         title: 'Unicode Character Database',
         blocks: result.rows,
         timestamp: Date.now(),
-        blocksJSON: JSON.stringify(result.rows)
+        blocksJSON: JSON.stringify(result.rows),
+        pageSize: MAX_RESULTS
       });
     });
   });
@@ -155,7 +156,7 @@ exports.search = function (req, res) {
   var startTime = process.hrtime(),
     endTime,
 
-    offset,
+    offset = 0,
     result = {};
 
   // If both name and block_id are missing, we don't know what to search for.
@@ -171,8 +172,8 @@ exports.search = function (req, res) {
 
   result.count = result.rows.length;
   if (result.count > MAX_RESULTS) {
-    if (req.query.page) {
-      offset = parseInt(req.query.page, 10) * MAX_RESULTS;
+    if (req.query.offset) {
+      offset = parseInt(req.query.offset, 10) * MAX_RESULTS;
       result.rows = result.rows.slice(offset, offset + MAX_RESULTS);
     } else {
       result.rows = result.rows.slice(0, MAX_RESULTS);
@@ -186,6 +187,7 @@ exports.search = function (req, res) {
     req.ip,
     '"' + req.query.name + '"',
     '"' + req.query.block_id + '" (' + blocks[req.query.block_id] + ')',
+    'o:' + offset,
     result.count,
     endTime + 'ms'
   ].join('\t'));
