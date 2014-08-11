@@ -3,7 +3,7 @@ var pg = require('pg'),
   fs = require('fs'),
   config = JSON.parse(fs.readFileSync('config.json')).db,
 
-  MAX_RESULTS = 500,
+  MAX_RESULTS = 100,
 
   // The more unwieldy SQL strings are in their own files:
   SQL = {
@@ -155,6 +155,7 @@ exports.search = function (req, res) {
   var startTime = process.hrtime(),
     endTime,
 
+    offset,
     result = {};
 
   // If both name and block_id are missing, we don't know what to search for.
@@ -170,7 +171,12 @@ exports.search = function (req, res) {
 
   result.count = result.rows.length;
   if (result.count > MAX_RESULTS) {
-    result.rows = result.rows.slice(0, MAX_RESULTS);
+    if (req.query.page) {
+      offset = parseInt(req.query.page, 10) * MAX_RESULTS;
+      result.rows = result.rows.slice(offset, offset + MAX_RESULTS);
+    } else {
+      result.rows = result.rows.slice(0, MAX_RESULTS);
+    }
   }
 
   endTime = (process.hrtime(startTime)[1] / 1000000).toFixed(1);
