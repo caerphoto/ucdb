@@ -49,7 +49,7 @@
     return '?' + q.join('&');
   }
 
-  function fetchChars(blockId, searchString, callback) {
+  function fetchChars(blockId, searchString, offset, callback) {
     var xhr = new XMLHttpRequest(),
       url = '/search';
 
@@ -66,12 +66,12 @@
       }
     }, false);
 
-    if (currentOffset) {
+    if (offset) {
       xhr.open('GET', url +
         queryStringFromObject({
           block_id: blockId,
           name: searchString,
-          offset: currentOffset
+          offset: offset
         }), true);
     } else {
       xhr.open('GET', url +
@@ -86,19 +86,20 @@
     xhr.send();
   } // ajax()
 
-  function renderList(clientOnly) {
+  function renderList(appending) {
     var view = {
-        count: charCache.length,
+        count: searchCount,
         characters: charCache
       },
-      tempElement;
+      offset = currentOffset * UCDB.pageSize,
+      blockId = blockSelect.getAttribute('data-value'),
+      elTemp;
 
-    if (currentOffset) {
-      view.count += currentOffset * UCDB.pageSize;
-    }
-
-    if (view.count < searchCount) {
-      view.count = charCache.length + ' of ' + searchCount + ' matching';
+    // Pagination button will be hidden via CSS if wgl4Only.checked, regardless
+    // of whether view.canPaginate is true or not, because if a block contains a
+    // lot of characters but few in WGL4, clicking 'Load More' might appear to
+    // do nothing.
+    if (charCache.length < searchCount) {
       view.canPaginate = true;
     }
 
@@ -106,19 +107,40 @@
       view.characters = charCache.filter(function (ch) {
         return !!ch.wgl4;
       });
-      view.count = view.characters.length + ' of ' + charCache.length;
     }
 
-    view.showBlock = !blockOnly.checked;
+    // showBlock determines whether a link to each character's block is shown.
+    view.showBlock = (!blockOnly.checked && searchBox.value) || blockId === '-1';
 
-    if (!clientOnly && currentOffset) {
-      tempElement = D.createElement('tbody');
-      tempElement.innerHTML = tmpl.subcharlist(view);
-      while (tempElement.firstChild) {
-        subCharList.appendChild(tempElement.removeChild(tempElement.firstChild));
+    if (appending) {
+      // In order to bulk-append, just the rows (rather than the whole heading +
+      // full table) and a minimal surrounding table are rendered into a
+      // temporary element, then the table's rows are transferred to a document
+      // fragment, which is then appended to the table. It's done this way
+      // because you can't directly set the .innerHTML of a document fragment
+      // or, in IE, a <tbody>, and using DOM functions to build the rows
+      // defeats the purpose of using templating in the first place.
+      view.characters = view.characters.slice(offset, offset + UCDB.pageSize);
+      elTemp = D.createElement('div');
+      elTemp.innerHTML =
+        '<table><tbody>' +
+        tmpl.subcharlist(view) +
+        '</tbody></table>';
+      elTemp = elTemp.querySelector('tbody');
+
+      while (elTemp.firstChild) {
+        subCharList.appendChild(elTemp.removeChild(elTemp.firstChild));
       }
       charList.querySelector('tbody').appendChild(subCharList);
 
+      // The created <div> and its now-empty table child will be
+      // garbage-collected once this function finishes, since there's no longer
+      // a reference to it.
+
+      if (charCache.length >= searchCount) {
+        elTemp = charList.querySelector('.pagination');
+        elTemp.parentNode.removeChild(elTemp);
+      }
     } else {
       if (charCache.length === 0) {
         charList.innerHTML = tmpl.no_result();
@@ -128,26 +150,27 @@
     }
   }
 
-  function updateList() {
+  function updateList(appending) {
     var blockId = blockSelect.getAttribute('data-value');
 
     if (!blockOnly.checked && searchBox.value !== '') {
       blockId = '';
     }
 
-    fetchChars(blockId, searchBox.value, function (err, result) {
+    fetchChars(blockId, searchBox.value, currentOffset, function (err, result) {
 
       if (err) {
         return alert(err);
       }
 
-      if (currentOffset) {
-        charCache.concat(result.chars);
+
+      if (appending) {
+        charCache = charCache.concat(result.chars);
       } else {
         charCache = result.chars;
       }
       searchCount = result.count;
-      renderList();
+      renderList(appending);
     });
   }
 
@@ -233,16 +256,13 @@
       BLOCK_ONLY = /b/,
       WGL4_ONLY = /w/;
 
-    // If state has changed, the whole list will need to be re-rendered, not
-    // just part of it.
-    currentOffset = 0;
-
     hash = hash.split('/');
 
     // Try to use block ID, for backwards compatibility with old URLs.
     setSelectValue(hash[0]);
 
     if (hash.length !== 3) {
+      // Hash is in an unknown state, so reset it.
       setHashFromState(true);
     } else {
       searchBox.value = decodeURIComponent(hash[1]);
@@ -251,17 +271,21 @@
     }
 
     if (!gCacheIsValid) {
+      // If state has changed, the whole list will need to be re-rendered, not
+      // just part of it.
+      currentOffset = 0;
       updateList();
     }
   }
 
-  function setHashFromState(clientOnly) {
-    // Setting gCacheIsValid to true will prevent the hashchange event handler
-    // from calling updateList() - this is helpful if we just want to change the
-    // hash without making a query to the server, such as when toggling the
-    // WGL4-only checkbox.
-    if (clientOnly) {
+  function setHashFromState(setCacheValid) {
+    // The cache should, by default be invalid, so when setCacheValid is true,
+    // we need to reset validity back to false after updating the hash.
+    if (setCacheValid) {
       gCacheIsValid = true;
+      setTimeout(function () {
+        gCacheIsValid = false;
+      }, 0);
     }
 
     window.location.hash = [
@@ -269,10 +293,6 @@
       encodeURIComponent(searchBox.value),
       (blockOnly.checked ? 'b' : '') + (wgl4Only.checked ? 'w' : '')
     ].join('/');
-
-    window.setTimeout(function () {
-      gCacheIsValid = false;
-    }, 0);
 
   }
 
@@ -287,6 +307,7 @@
     wgl4Only = D.querySelector('#wgl4_only');
     charList = D.querySelector('#charlist');
 
+    Handlebars.registerPartial('subcharlist', tmpl.subcharlist);
     blockList.innerHTML = tmpl.blocklist({ blocks: UCDB.blocks });
 
     if (window.location.hash) {
@@ -325,20 +346,16 @@
     searchBox.addEventListener('input', function () {
       clearTimeout(searchThrottle);
       searchThrottle = setTimeout(function () {
-        // No need to explicitly update the list, since it happens when the hash
-        // is changed anyway.
         setHashFromState();
       }, 500);
     }, false);
 
     blockOnly.addEventListener('change', function () {
-      setHashFromState(true);
-      if (searchBox.value) {
-        updateList();
-      }
+      setHashFromState();
     }, false);
 
     wgl4Only.addEventListener('change', function () {
+      toggleClass(charList, 'wgl4-only', wgl4Only.checked);
       renderList();
       setHashFromState(true);
     }, false);
@@ -358,7 +375,7 @@
 
       if (el.nodeName === 'BUTTON') {
         currentOffset += 1;
-        updateList();
+        updateList(true);
         return;
       }
 

@@ -305,6 +305,14 @@ input[type=checkbox] + label::before {
   background-color: #fafafa;
 }
 
+#charlist span.wgl4 {
+  display: none;
+}
+
+#charlist tr.wgl4 span.wgl4 {
+  display: inline;
+}
+
 #charlist tr:nth-child(even) {
   background-color: #f0f1f2;
 }
@@ -342,7 +350,7 @@ input[type=checkbox] + label::before {
   font-family: "Source Code Pro", "Menlo", "Consolas", monospace;
 }
 
-.name > span {
+.name > .wgl4 {
   /* 'in WGL4' text */
   text-transform: none;
   color: #008000;
@@ -352,6 +360,7 @@ input[type=checkbox] + label::before {
 }
 
 td.char span {
+  /* Actual character display */
   color: #444;
   box-shadow: 0 0 6px rgba(0,0,0,0.1);
   background: #fff;
@@ -366,6 +375,10 @@ td.char span {
 .block a {
   text-decoration: none;
   border-bottom-width: 1px;
+}
+
+#charlist.wgl4-only .pagination {
+  display: none;
 }
 
 @media screen and (max-width: 600px) {

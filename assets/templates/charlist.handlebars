@@ -1,4 +1,4 @@
-<h2>{{count}} characters</h2>
+<h2>{{count}} characters found</h2>
 <table>
   <thead>
     <tr>
@@ -13,28 +13,11 @@
     </tr>
   </thead>
   <tbody>
-  {{#each characters}}
-    <tr>
-      <td class="char"><span>{{{char}}}</span></td>
-      <td class="dec">{{code}}</td>
-      <td class="hex">{{hexCode}}</td>
-      <td class="entity">{{#if htmlEntity}}&amp;{{htmlEntity}};{{/if}}</td>
-      <td class="name">
-        {{name}}
-        {{#if altName}}
-          ({{altName}})
-        {{/if}}
-        {{#if wgl4}}<span>(✓<span class="large-screen"> in WGL4</span>)</span>{{/if}}
-      </td>
-
-      {{#if ../showBlock}}
-      <td class="block"><a href="#{{blockId}}">{{block}}</a></td>
-      {{/if}}
-    </tr>
-  {{/each}}
+    {{! remember: partials must be registered with Handlebars.registerPartial() }}
+    {{> subcharlist}}
   </tbody>
 </table>
 
 {{#if canPaginate}}
-<button class="pagination">Show More</button>
+<button class="pagination">Load More</button>
 {{/if}}

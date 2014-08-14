@@ -3,7 +3,7 @@ var pg = require('pg'),
   fs = require('fs'),
   config = JSON.parse(fs.readFileSync('config.json')).db,
 
-  MAX_RESULTS = 10,
+  MAX_RESULTS = 128,
 
   // The more unwieldy SQL strings are in their own files:
   SQL = {
