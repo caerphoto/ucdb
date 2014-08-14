@@ -92,7 +92,7 @@ function program1(depth0,data,depth1) {
     + "\n      ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.altName), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n      <span class=\"wgl4\">(✓<span class=\"large-screen\"> in WGL4</span>)</span>\n    </td>\n\n    ";
+  buffer += "\n      <span class=\"wgl4\"><img src=\"/media/windows-logo.svg\" class=\"windows-logo\" alt=\"Windows logo\"><span class=\"large-screen\"> in WGL4</span></span>\n    </td>\n\n    ";
   stack1 = helpers['if'].call(depth0, (depth1 && depth1.showBlock), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n  </tr>\n";

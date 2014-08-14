@@ -310,7 +310,14 @@ input[type=checkbox] + label::before {
 }
 
 #charlist tr.wgl4 span.wgl4 {
-  display: inline;
+  display: inline-block;
+}
+
+.windows-logo {
+  width: 14px;
+  height: 14px;
+  vertical-align: -0.1em;
+  padding-left: 0.2em;
 }
 
 #charlist tr:nth-child(even) {
@@ -444,6 +451,9 @@ td.char span {
     font-weight: bold;
   }
 
+  .windows-logo {
+    vertical-align: -0.3em;
+  }
 
 }
 
