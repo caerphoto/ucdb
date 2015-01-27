@@ -111,6 +111,7 @@
 
     // showBlock determines whether a link to each character's block is shown.
     view.showBlock = (!blockOnly.checked && searchBox.value) || blockId === '-1';
+    view.numRemaining = searchCount - charCache.length;
 
     if (appending) {
       // In order to bulk-append, just the rows (rather than the whole heading +
@@ -137,10 +138,14 @@
       // garbage-collected once this function finishes, since there's no longer
       // a reference to it.
 
+      elTemp = charList.querySelector('.pagination');
       if (charCache.length >= searchCount) {
-        elTemp = charList.querySelector('.pagination');
         elTemp.parentNode.removeChild(elTemp);
+      } else {
+        elTemp = elTemp.querySelector('span');
+        elTemp.innerHTML = '(' + view.numRemaining + ' remaining)';
       }
+
     } else {
       if (charCache.length === 0) {
         charList.innerHTML = tmpl.no_result();

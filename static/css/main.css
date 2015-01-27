@@ -158,8 +158,15 @@ button:focus {
 
 
 table + button {
-  width: 10em;
+  width: 17em;
   margin: 1em auto;
+  padding: 0.4em 0.5em;
+  line-height: 1.2;
+}
+
+table + button > span {
+  color: #888;
+  font-size: 0.8em;
 }
 
 .dropdown {

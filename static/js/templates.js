@@ -39,8 +39,13 @@ function program1(depth0,data) {
 
 function program3(depth0,data) {
   
-  
-  return "\n<button class=\"pagination\">Load More</button>\n";
+  var buffer = "", stack1, helper;
+  buffer += "\n<button class=\"pagination\">Load More<br><span>(";
+  if (helper = helpers.numRemaining) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.numRemaining); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " remaining)</span></button>\n";
+  return buffer;
   }
 
   buffer += "<h2>";
