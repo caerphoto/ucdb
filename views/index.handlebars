@@ -6,8 +6,50 @@
     <title>{{title}}</title>
     <link rel="shortcut icon" href="http://andyf.me/favicon.ico">
     <link rel="stylesheet" href="/css/main.css">
+    <script>
+// Discover the system UI font and create a CSS rule for it.
+// https://css-tricks.com/os-specific-fonts-css/
+(function() {
+    window.addEventListener("DOMContentLoaded", function() {
+        getSystemFontFamily(function(systemFontFamily) {
+            var cssText = ".system-font { font-family: " + systemFontFamily + " }";
+            var element = createStyleElement(cssText);
+            document.head.insertBefore(element, document.head.firstChild);
+        });
+    });
+
+    function getSystemFontFamily(callback) {
+        withHiddenFrame(function(document) {
+            var button = document.createElement("button");
+            document.body.appendChild(button);
+            callback(window.getComputedStyle(button).fontFamily);
+        });
+    }
+
+    function withHiddenFrame(callback) {
+        var frame = document.createElement("iframe");
+        frame.style.cssText = "width: 0; height: 0; visibility: hidden";
+        frame.onload = function() {
+            callback(frame.contentDocument);
+            document.body.removeChild(frame);
+        };
+        document.body.appendChild(frame);
+    }
+
+    function createStyleElement(cssText) {
+        var element = document.createElement("style");
+        element.type = "text/css";
+        if (element.styleSheet) {
+            element.styleSheet.cssText = cssText;
+        } else {
+            element.appendChild(document.createTextNode(cssText));
+        }
+        return element;
+    }
+})();
+    </script>
   </head>
-  <body>
+  <body class="system-font">
     <div id="bg"></div>
     <header>
       <h1>{{title}}</h1>
