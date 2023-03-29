@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'DejaVuSans';
-  src: url('/media/fonts/DejaVuSans-webfont.eot');
-  src: url('/media/fonts/DejaVuSans-webfont.eot?iefix') format('eot'),
-       url('/media/fonts/DejaVuSans-webfont.woff') format('woff'),
-       url('/media/fonts/DejaVuSans-webfont.ttf') format('truetype'),
-       url('/media/fonts/DejaVuSans-webfont.svg#webfont') format('svg');
+  src: url('/ucdb/media/fonts/DejaVuSans-webfont.eot');
+  src: url('/ucdb/media/fonts/DejaVuSans-webfont.eot?iefix') format('eot'),
+       url('/ucdb/media/fonts/DejaVuSans-webfont.woff') format('woff'),
+       url('/ucdb/media/fonts/DejaVuSans-webfont.ttf') format('truetype'),
+       url('/ucdb/media/fonts/DejaVuSans-webfont.svg#webfont') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -349,6 +349,10 @@ input[type=checkbox] + label::before {
 
 #charlist .char {
   width: 2rem;
+}
+
+#charlist .char.copied {
+  background-color: hsl(120, 50%, 82%);
 }
 
 #charlist .dec,

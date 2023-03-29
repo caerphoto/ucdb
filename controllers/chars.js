@@ -1,4 +1,4 @@
-/*jshint node:true */
+/* eslint indent: [2, "warn"] */
 var pg = require('pg'),
   fs = require('fs'),
   config = JSON.parse(fs.readFileSync('config.json')).db,

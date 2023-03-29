@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, maximum-scale=1">
     <title>{{title}}</title>
-    <link rel="shortcut icon" href="http://andyf.me/favicon.ico">
-    <link rel="stylesheet" href="/css/main.css">
+    <link rel="shortcut icon" href="https://andyf.me/favicon.ico">
+    <link rel="stylesheet" href="/ucdb/css/main.css">
     <script>
 // Discover the system UI font and create a CSS rule for it.
 // https://css-tricks.com/os-specific-fonts-css/
@@ -92,7 +92,14 @@
         <br>
 
         <label for="search">Search: </label>
-        <input id="search" type="search" placeholder="enter a character name or code" data-last-value="">
+        <input id="search"
+          type="search"
+          placeholder="enter a character name or code"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          data-last-value="">
         <input id="block_only" type="checkbox">
         <label for="block_only" title="Ignored for single character searches.">in selected block only</label>
 
@@ -110,9 +117,8 @@
       <p>By <a href="http://andyf.me/">Andy Farrell</a>.</p>
     </footer>
 
-    <script src="/js/lib/handlebars.runtime-v1.3.0.js"></script>
-    <script src="/js/templates.js"></script>
-    <!--<script src="/js/randomcharbg.js"></script>-->
-    <script src="/js/main.js"></script>
+    <script src="/ucdb/js/lib/handlebars.runtime-v1.3.0.js"></script>
+    <script src="/ucdb/js/templates.js"></script>
+    <script src="/ucdb/js/main.js"></script>
   </body>
 </html>

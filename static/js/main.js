@@ -1,5 +1,6 @@
 /* global Handlebars, UCDB */
-(function (D) {
+/* eslint indent: [2, "warn"] */
+(function(D) {
   var tmpl = Handlebars.templates,
 
     charCache = [],
@@ -43,7 +44,7 @@
 
     var q = [];
 
-    Object.keys(o).forEach(function (key) {
+    Object.keys(o).forEach(function(key) {
       q.push(key + '=' + encodeURIComponent(o[key] || ''));
     });
     return '?' + q.join('&');
@@ -51,9 +52,9 @@
 
   function fetchChars(blockId, searchString, offset, callback) {
     var xhr = new XMLHttpRequest(),
-      url = '/search';
+      url = '/ucdb/search';
 
-    xhr.addEventListener('load', function () {
+    xhr.addEventListener('load', function() {
       charList.className = '';
       if (xhr.status === 200 || xhr.status === 404) {
         if (callback instanceof Function) {
@@ -88,9 +89,9 @@
 
   function renderList(appending) {
     var view = {
-        count: searchCount,
-        characters: charCache
-      },
+      count: searchCount,
+      characters: charCache
+    },
       offset = currentOffset * UCDB.pageSize,
       blockId = blockSelect.getAttribute('data-value'),
       elTemp;
@@ -104,7 +105,7 @@
     }
 
     if (wgl4Only.checked) {
-      view.characters = charCache.filter(function (ch) {
+      view.characters = charCache.filter(function(ch) {
         return !!ch.wgl4;
       });
     }
@@ -162,7 +163,7 @@
       blockId = '';
     }
 
-    fetchChars(blockId, searchBox.value, currentOffset, function (err, result) {
+    fetchChars(blockId, searchBox.value, currentOffset, function(err, result) {
 
       if (err) {
         return alert(err);
@@ -288,7 +289,7 @@
     // we need to reset validity back to false after updating the hash.
     if (setCacheValid) {
       gCacheIsValid = true;
-      setTimeout(function () {
+      setTimeout(function() {
         gCacheIsValid = false;
       }, 0);
     }
@@ -303,7 +304,7 @@
 
   // Main initialisation function
   // ---------------------------------------------------------------------------
-  D.addEventListener('DOMContentLoaded', function () {
+  D.addEventListener('DOMContentLoaded', function() {
 
     blockSelect = D.querySelector('#block');
     blockList = D.querySelector('#block_list');
@@ -326,18 +327,18 @@
     window.addEventListener('hashchange', setStateFromHash);
 
     // Close dropdown on click anywhere on the page.
-    D.addEventListener('click', function (evt) {
+    D.addEventListener('click', function(evt) {
       if (!hasClass(evt.target.parentNode, 'dropdown')) {
         removeClass(blockSelect.parentNode, 'open', false);
       }
     }, false);
 
-    blockSelect.addEventListener('click', function () {
+    blockSelect.addEventListener('click', function() {
       toggleClass(this.parentNode, 'open');
     });
 
     // --- The rest of these events change state ---
-    blockList.addEventListener('click', function (evt) {
+    blockList.addEventListener('click', function(evt) {
       var el = evt.target;
 
       blockOnly.checked = true;
@@ -348,24 +349,24 @@
       evt.preventDefault();
     }, false);
 
-    searchBox.addEventListener('input', function () {
+    searchBox.addEventListener('input', function() {
       clearTimeout(searchThrottle);
-      searchThrottle = setTimeout(function () {
+      searchThrottle = setTimeout(function() {
         setHashFromState();
       }, 500);
     }, false);
 
-    blockOnly.addEventListener('change', function () {
+    blockOnly.addEventListener('change', function() {
       setHashFromState();
     }, false);
 
-    wgl4Only.addEventListener('change', function () {
+    wgl4Only.addEventListener('change', function() {
       toggleClass(charList, 'wgl4-only', wgl4Only.checked);
       renderList();
       setHashFromState(true);
     }, false);
 
-    charList.addEventListener('click', function (evt) {
+    charList.addEventListener('click', function(evt) {
       var el = evt.target,
         parent = el.parentNode;
 
@@ -384,14 +385,16 @@
         return;
       }
 
-      if (parent.nodeName === 'TD' && parent.className === 'char') {
-        // iOS won't show the element as selected unless contentEditable is true
-        el.setAttribute('contentEditable', true);
-        selectText(el);
-        setTimeout(function () {
-          el.removeAttribute('contentEditable');
-        }, 0);
-
+      if (parent.nodeName === 'TD' && parent.classList.contains('char')) {
+        const clipText = el.textContent;
+        navigator.clipboard
+          .writeText(clipText)
+          .then(function() {
+            parent.classList.add('copied');
+            setTimeout(function() {
+              parent.classList.remove('copied');
+            }, 2000);
+          });
       }
     });
 
